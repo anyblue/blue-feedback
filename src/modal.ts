@@ -1,6 +1,6 @@
 import {template2dom} from './utils';
 import ImagesUpload from './imagesUpload';
-import styles from  './assets/css/index.css';
+import styles from  './assets/css/index.less';
 
 export default class Modal {
     el: HTMLElement;
@@ -27,17 +27,11 @@ export default class Modal {
         const enterBtn = this.el.querySelector(`.${styles.button}.${styles.enter} `);
         enterBtn?.addEventListener('click', this.enter.bind(this));
 
-        // const content = this.el.querySelector(`.styles.modal_content`);
-        // modal.appendChild(new ImagesUpload().el);
+        const content = this.el.querySelector(`.${styles.modal_content}`);
+        content?.appendChild(new ImagesUpload().el);
 
         wrap.appendChild(this.el);
     }
-    // createContent() {
-    //     const content = document.createElement('div');
-    //     content.className = styles.modal_content;
-    //     content.appendChild(new ImagesUpload().el);
-    //     return content
-    // }
     cancle() {
         this.hidden();
     }

@@ -1,7 +1,7 @@
 import Modal from './modal';
 import {Dropdown, Option} from './dropdown';
 import {template2dom} from './utils';
-import styles from  './assets/css/index.css';
+import styles from  './assets/css/index.less';
 
 class Entry {
     el = template2dom(`

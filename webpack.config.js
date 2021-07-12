@@ -1,5 +1,8 @@
 var path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+var md5 = require('md5');
+
+var affix = md5(path.parse(__dirname)).slice(0, 5); // 将目录名md5作为CssModule的后缀
 
 function resolve(dir) {
     return path.join(__dirname, dir);
@@ -64,7 +67,7 @@ module.exports = {
                         loader: 'css-loader',
                         options: {
                             modules: {
-                                localIdentName: `[local]_[hash:5]`,
+                                localIdentName: `blue_[local]_${affix}`,
                             }
                         }
                     }

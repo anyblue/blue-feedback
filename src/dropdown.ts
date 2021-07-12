@@ -1,6 +1,6 @@
 import Modal from './modal';
 import {template2dom} from './utils';
-import styles from  './assets/css/index.css';
+import styles from  './assets/css/index.less';
 
 export interface Option {
     text: string;
