@@ -21,14 +21,14 @@ class Entry {
         },
         {
             text: '问题报错',
-            modal: new Modal(this.el, '问题报错'),
+            modal: new Modal(this.el, '问题报错', '请输入问题描述以及正确描述'),
             handler() {
                 this.modal?.show();
             }
         },
         {
             text: '意见反馈',
-            modal: new Modal(this.el, '意见反馈'),
+            modal: new Modal(this.el, '意见反馈', '请输入您的建议/反馈'),
             handler() {
                 this.modal?.show();
             }

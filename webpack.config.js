@@ -52,7 +52,7 @@ module.exports = {
                         loader: 'css-loader',
                         options: {
                             modules: {
-                                localIdentName: '[local]_[hash:5]',
+                                localIdentName: `blue_[local]_${affix}`,
                             }
                         }
                     },

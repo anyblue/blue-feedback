@@ -1,10 +1,11 @@
 import {template2dom} from './utils';
 import ImagesUpload from './imagesUpload';
+import Textarea from './textarea';
 import styles from  './assets/css/index.less';
 
 export default class Modal {
     el: HTMLElement;
-    constructor(wrap: HTMLElement, title: string) {
+    constructor(wrap: HTMLElement, title: string, placeholder: string) {
         this.el = template2dom(`
             <div class="${`${styles.modal_wrap} ${styles.hidden}`}">
                 <div class="${styles.modal}">
@@ -14,8 +15,8 @@ export default class Modal {
                     </h3>
                     <div class="${styles.modal_content}" ></div>
                     <div class="${styles.modal_footer}">
-                        <button class="${`${styles.button} ${styles.enter}`}">确定<button>
-                        <button class="${styles.button}">取消<button>
+                        <button class="${`${styles.button} ${styles.enter}`}">确定</button>
+                        <button class="${styles.button}">取消</button>
                     </div>
                 </div>
             </div>
@@ -29,6 +30,7 @@ export default class Modal {
 
         const content = this.el.querySelector(`.${styles.modal_content}`);
         content?.appendChild(new ImagesUpload().el);
+        content?.appendChild(new Textarea({placeholder, maxLength: 20}).el);
 
         wrap.appendChild(this.el);
     }
