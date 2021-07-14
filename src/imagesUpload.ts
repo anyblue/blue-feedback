@@ -1,24 +1,30 @@
-import styles from  './assets/css/index.less';
+import styles from './assets/css/index.less';
 import {template2dom, EventCleaner} from './utils';
 // 计数避免 id 冲突
 let count = 0;
 
-class StateError extends Error {name = 'StateError'}
-class SizeError extends Error {name = 'SizeError'}
-class FileTypeError extends Error {name = 'FileTypeError'}
+class StateError extends Error {
+    name = 'StateError';
+};
+class SizeError extends Error {
+    name = 'SizeError';
+};
+class FileTypeError extends Error {
+    name = 'FileTypeError';
+};
 
 interface ImageFile {
     detail: File;
     error?: Error;
 }
 export default class ImagesUpload extends EventCleaner {
-    private id = `${styles.upload}_${++count}`;
-    private label = template2dom(`<label class="${styles.image_row}" for="${this.id}"></label>`);
-    private count = 4;
-    private itemSize = 2;
     files = [] as ImageFile[];
-    el: HTMLElement
-    private input ?: HTMLInputElement;
+    el: HTMLElement;
+    private readonly id = `${styles.upload}_${++count}`;
+    private readonly label = template2dom(`<label class="${styles.image_row}" for="${this.id}"></label>`);
+    private readonly count: number;
+    private readonly itemSize: number;
+    private input?: HTMLInputElement;
     constructor(params?: {
         // 图片数量上限
         count: number;
@@ -26,12 +32,8 @@ export default class ImagesUpload extends EventCleaner {
         itemSize: number;
     }) {
         super();
-        if (params?.count) {
-            this.count = params.count;
-        }
-        if (params?.itemSize) {
-            this.itemSize = params.itemSize;
-        }
+        this.count = params?.count ?? 4;
+        this.itemSize = params?.itemSize ?? 2;
         this.el = template2dom(`
             <div class="${styles.upload}">
                 <div class="${styles.image_row}">
@@ -59,6 +61,25 @@ export default class ImagesUpload extends EventCleaner {
         });
         this.updateImages();
     }
+    setFiles(value: FileList|File[], append = true): void {
+        if (!append) {
+            this.files = [];
+        }
+        for (const file of value) {
+            if (this.files.length >= this.count) {
+                break;
+            }
+            this.files.push({detail: file});
+        }
+        this.files = this.files.slice(0, this.count);
+        this.updateImages();
+        if (this.input) {
+            this.input.value = '';
+        }
+    }
+    unmounted(): void {
+        this.cleanEvent();
+    }
     private updateImages() {
         const wrap = this.el.getElementsByClassName(styles.image_row)[0];
         wrap.innerHTML = '';
@@ -75,7 +96,7 @@ export default class ImagesUpload extends EventCleaner {
                 const result = String(e.target?.result ?? '');
                 const stateLegal = e.type === 'load';
                 const sizeLegal = e.total < this.itemSize * Math.pow(2, 20);
-                const typeLegal = result.match(/^data:image\//);
+                const typeLegal = result.startsWith('data:image/');
                 const isSuccess = stateLegal && sizeLegal && typeLegal;
                 const image = template2dom(`
                     <div class="${isSuccess ? '' : styles.error}" title="${file.detail.name}">
@@ -105,30 +126,11 @@ export default class ImagesUpload extends EventCleaner {
             }
         };
         this.files.forEach(file => {
-            const reader = new  FileReader();
+            const reader = new FileReader();
             readerMap.set(reader, file);
             reader.addEventListener('load', addImage);
             reader.addEventListener('error', addImage);
             reader.readAsDataURL(file.detail);
         });
-    }
-    setFiles(value: FileList|File[], append = true) {
-        if (!append) {
-            this.files = [];
-        } 
-        for (const file of value) {
-            if (this.files.length >= this.count) {
-                break;
-            }
-            this.files.push({detail: file});
-        }
-        this.files = this.files.slice(0, this.count);
-        this.updateImages();
-        if (this.input) {
-            this.input.value = '';
-        }
-    }
-    unmounted() {
-        this.cleanEvent();
     }
 }

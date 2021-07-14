@@ -1,6 +1,6 @@
 import Modal from './modal';
 import {template2dom, EventCleaner} from './utils';
-import styles from  './assets/css/index.less';
+import styles from './assets/css/index.less';
 
 export interface Option {
     text: string;
@@ -9,34 +9,32 @@ export interface Option {
 }
 
 export class Dropdown extends EventCleaner {
-    el: HTMLElement
+    el: HTMLElement;
     actived = false;
-    option: Option[]
+    option: Option[];
     constructor(wrap: HTMLElement, option: Option[]) {
         super();
         this.el = template2dom(`
-            <ul class="${`${styles.dropdown} ${styles.hidden}`}">${
-                option.map((item, index) =>
-                    `<li drop-index="${index}">${item.text}</li>`)
-                    .join('')
-            }</ul>
+            <ul class="${`${styles.dropdown} ${styles.hidden}`}">
+            ${option.map((item, index) => `<li drop-index="${index}">${item.text}</li>`).join('')}
+            </ul>
         `);
         this.option = option;
         this.addEventListener(this.el, 'click', event => {
             event.target as HTMLElement|null;
             const target = event.target as HTMLElement|null;
-            const index = Number(target?.getAttribute('drop-index'))
+            const index = Number(target?.getAttribute('drop-index'));
             if (option[index]) {
                 option[index].handler();
                 this.hidden();
             }
         });
         this.addEventListener(document.documentElement, 'click', event => {
-            const eventPath = event.composedPath()
+            const eventPath = event.composedPath();
             if (eventPath.includes(this.el)) {
                 return;
             }
-            if (!eventPath.includes(wrap)|| this.actived) {
+            if (!eventPath.includes(wrap) || this.actived) {
                 this.hidden();
             }
             else {
@@ -46,15 +44,15 @@ export class Dropdown extends EventCleaner {
 
         wrap.appendChild(this.el);
     }
-    hidden() {
+    hidden(): void {
         this.actived = false;
         this.el.className = `${styles.dropdown} ${styles.hidden}`;
     }
-    show() {
+    show(): void {
         this.actived = true;
         this.el.className = `${styles.dropdown} ${styles.show}`;
     }
-    unmounted() {
+    unmounted(): void {
         this.cleanEvent();
         this.option.forEach(item => {
             if (item.modal) {

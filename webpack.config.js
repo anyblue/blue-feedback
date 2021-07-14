@@ -19,7 +19,7 @@ module.exports = {
         }),
     ],
     resolve: {
-        extensions: ['.tsx', '.ts', '.js'],
+        extensions: ['.ts', '.js'],
     },
     output: {
         clean: true,
@@ -34,7 +34,7 @@ module.exports = {
         rules: [
             {
                 test: /\.ts$/i,
-                use: ['babel-loader', 'ts-loader'],
+                use: ['babel-loader', 'ts-loader', 'eslint-loader'],
                 exclude: /node_modules/,
             },
             {
@@ -75,7 +75,7 @@ module.exports = {
             },
             {
                 test: /\.(png|svg|jpg|jpeg|gif)$/i,
-                type: 'asset/resource',
+                type: 'asset',
             },
         ],
     }

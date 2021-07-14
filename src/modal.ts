@@ -1,12 +1,12 @@
 import {template2dom, EventCleaner} from './utils';
 import ImagesUpload from './imagesUpload';
 import Textarea from './textarea';
-import styles from  './assets/css/index.less';
+import styles from './assets/css/index.less';
 
 export default class Modal extends EventCleaner {
     el: HTMLElement;
-    private imagesUpload: ImagesUpload;
-    private textarea: Textarea;
+    private readonly imagesUpload: ImagesUpload;
+    private readonly textarea: Textarea;
 
     constructor(wrap: HTMLElement, title: string, placeholder: string) {
         super();
@@ -25,13 +25,13 @@ export default class Modal extends EventCleaner {
                 </div>
             </div>
         `);
-        const closeBtn = this.el.querySelector(`.${styles.close_btn}`) as HTMLElement|null;
+        const closeBtn: HTMLElement|null = this.el.querySelector(`.${styles.close_btn}`);
         closeBtn && this.addEventListener(closeBtn, 'click', this.cancle.bind(this));
 
-        const cancleBtn = this.el.querySelector(`.${styles.button}:not(.${styles.enter})`) as HTMLElement|null;
+        const cancleBtn: HTMLElement|null = this.el.querySelector(`.${styles.button}:not(.${styles.enter})`);
         cancleBtn && this.addEventListener(cancleBtn, 'click', this.cancle.bind(this));
 
-        const enterBtn = this.el.querySelector(`.${styles.button}.${styles.enter} `) as HTMLElement|null;
+        const enterBtn: HTMLElement|null = this.el.querySelector(`.${styles.button}.${styles.enter} `);
         enterBtn && this.addEventListener(enterBtn, 'click', this.enter.bind(this));
 
         const content = this.el.querySelector(`.${styles.modal_content}`);
@@ -42,27 +42,27 @@ export default class Modal extends EventCleaner {
 
         wrap.appendChild(this.el);
     }
-    private cancle() {
-        this.hidden();
-    }
-    private enter() {
-        this.hidden();
-    }
-    hidden() {
+    hidden(): void {
         document.body.style.overflow = '';
         document.body.style.position = '';
         this.el.className = `${styles.modal_wrap} ${styles.hidden}`;
         this.imagesUpload.setFiles([], false);
         this.textarea.setValue('');
     }
-    show() {
+    show(): void {
         document.body.style.overflow = 'hidden';
         document.body.style.position = 'relative';
         this.el.className = `${styles.modal_wrap} ${styles.show}`;
     }
-    unmounted() {
+    unmounted(): void {
         this.imagesUpload.unmounted();
         this.textarea.unmounted();
         this.cleanEvent();
+    }
+    private cancle(): void {
+        this.hidden();
+    }
+    private enter(): void {
+        this.hidden();
     }
 }
