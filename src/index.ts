@@ -10,7 +10,8 @@ class Entry {
                 <span>咨<br/>询</span>
             </div>
         </div>
-    ` )
+    ` );
+    private dropdown?: Dropdown;
     constructor() {
         const affix = this.el.querySelector(`.${styles.affix}`) as HTMLElement;
         const options: Option[] = [{
@@ -34,13 +35,14 @@ class Entry {
             }
         }];
         if (affix) {
-            new Dropdown(affix, options);
+            this.dropdown = new Dropdown(affix, options);
         }
+        document.body.appendChild(this.el);
+    }
+    // 用于清除后代绑定的事件监听
+    unmounted() {
+        this.dropdown?.unmounted();
     }
 }
 
-document.body.appendChild(new Entry().el);
-
-export default () => {
-    console.log('-------');
-};
+export default Entry;

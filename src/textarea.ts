@@ -2,10 +2,10 @@ import styles from  './assets/css/index.less';
 import {template2dom} from './utils';
 
 export default class Textarea {
-    maxLength = 0;
+    private maxLength = 0;
+    private hint?: HTMLElement;
+    private textarea?: HTMLTextAreaElement;
     el: HTMLElement;
-    hint?: HTMLElement;
-    textarea?: HTMLTextAreaElement;
     constructor(params?: {placeholder?: string, maxLength?: number}) {
         const hintContent = (value: number) => `${value} / ${params?.maxLength ?? 0}`;
         this.el = template2dom(`
@@ -22,24 +22,17 @@ export default class Textarea {
         if (!this.textarea || !this.maxLength) {
             return;
         }
-        this.textarea.addEventListener('change', (e: Event|{target?: HTMLInputElement}) => {
-            const length = e.target && 'value' in e.target ? e.target.value.length : 0;
-            this.update(length);
-        });
-        this.textarea.addEventListener('input', (e: Event|{target?: HTMLInputElement}) => {
-            const length = e.target && 'value' in e.target ? e.target.value.length : 0;
-            this.update(length);
-        });
+        this.textarea.addEventListener('change', this.changeHanler);
+        this.textarea.addEventListener('input', this.changeHanler);
     }
-    hintContent(value: number){
+    private hintContent(value: number){
         return `${value} / ${this.maxLength}`;
     }
-    setValue(value: string) {
-        if (this.textarea) {
-            this.textarea.value = value;
-        }
+    private changeHanler =  (e: Event|{target?: HTMLInputElement}) => {
+        const length = e.target && 'value' in e.target ? e.target.value.length : 0;
+        this.updateValue(length);
     }
-    update(length: number) {
+    private updateValue (length: number) {
         if (this.hint) {
             this.hint.innerText = this.hintContent(length);
         }
@@ -56,5 +49,15 @@ export default class Textarea {
             return;
         }
         this.el.className = elClassList.join(' ');
+    }
+    setValue(value: string) {
+        if (this.textarea) {
+            this.textarea.value = value;
+            this.updateValue(value.length);
+        }
+    }
+    unmounted() {
+        this.textarea?.removeEventListener('change', this.changeHanler);
+        this.textarea?.removeEventListener('input', this.changeHanler);
     }
 }

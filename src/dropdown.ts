@@ -1,5 +1,5 @@
 import Modal from './modal';
-import {template2dom} from './utils';
+import {template2dom, EventCleaner} from './utils';
 import styles from  './assets/css/index.less';
 
 export interface Option {
@@ -8,10 +8,12 @@ export interface Option {
     handler(): void;
 }
 
-export class Dropdown {
+export class Dropdown extends EventCleaner {
     el: HTMLElement
     actived = false;
+    option: Option[]
     constructor(wrap: HTMLElement, option: Option[]) {
+        super();
         this.el = template2dom(`
             <ul class="${`${styles.dropdown} ${styles.hidden}`}">${
                 option.map((item, index) =>
@@ -19,7 +21,8 @@ export class Dropdown {
                     .join('')
             }</ul>
         `);
-        this.el.addEventListener('click', event => {
+        this.option = option;
+        this.addEventListener(this.el, 'click', event => {
             event.target as HTMLElement|null;
             const target = event.target as HTMLElement|null;
             const index = Number(target?.getAttribute('drop-index'))
@@ -28,7 +31,7 @@ export class Dropdown {
                 this.hidden();
             }
         });
-        document.documentElement.addEventListener('click', event => {
+        this.addEventListener(document.documentElement, 'click', event => {
             const eventPath = event.composedPath()
             if (eventPath.includes(this.el)) {
                 return;
@@ -50,5 +53,13 @@ export class Dropdown {
     show() {
         this.actived = true;
         this.el.className = `${styles.dropdown} ${styles.show}`;
+    }
+    unmounted() {
+        this.cleanEvent();
+        this.option.forEach(item => {
+            if (item.modal) {
+                item.modal.unmounted();
+            }
+        });
     }
 }

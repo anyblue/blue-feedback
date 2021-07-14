@@ -1,5 +1,5 @@
 import styles from  './assets/css/index.less';
-import {template2dom} from './utils';
+import {template2dom, EventCleaner} from './utils';
 // 计数避免 id 冲突
 let count = 0;
 
@@ -11,20 +11,21 @@ interface ImageFile {
     detail: File;
     error?: Error;
 }
-export default class ImagesUpload {
-    id = `${styles.upload}_${++count}`;
-    label = template2dom(`<label class="${styles.image_row}" for="${this.id}"></label>`);
+export default class ImagesUpload extends EventCleaner {
+    private id = `${styles.upload}_${++count}`;
+    private label = template2dom(`<label class="${styles.image_row}" for="${this.id}"></label>`);
+    private count = 4;
+    private itemSize = 2;
     files = [] as ImageFile[];
-    count = 4;
-    itemSize = 2;
     el: HTMLElement
-    input ?: HTMLInputElement;
+    private input ?: HTMLInputElement;
     constructor(params?: {
         // 图片数量上限
         count: number;
         // 单个图片大小上限（单位：MB）
         itemSize: number;
     }) {
+        super();
         if (params?.count) {
             this.count = params.count;
         }
@@ -44,21 +45,77 @@ export default class ImagesUpload {
             return;
         }
         this.input = input;
-        this.input.addEventListener('change', (e: Event|{target?: HTMLInputElement}) => {
+        this.addEventListener(this.input, 'change', (e: Event|{target?: HTMLInputElement}) => {
             const files = e.target
                 ? 'files' in e.target && e.target.files ? e.target.files : [] : [];
             this.setFiles(files);
         });
         // 禁止组件内的 dragover 的默认行为
         this.el.ondragover = () => false;
-        this.label.addEventListener('drop', e => {
+        this.addEventListener(this.label, 'drop', e => {
             e.preventDefault();
             const files = e.dataTransfer?.files ?? [];
             this.setFiles(files);
         });
         this.updateImages();
     }
-    setFiles(value: FileList|File[]) {
+    private updateImages() {
+        const wrap = this.el.getElementsByClassName(styles.image_row)[0];
+        wrap.innerHTML = '';
+        const appendLabel = () => {
+            if (this.files.length < this.count) {
+                wrap.appendChild(this.label);
+            }
+        };
+        appendLabel();
+        const readerMap = new Map<FileReader, ImageFile>();
+        const addImage = (e: ProgressEvent<FileReader>) => {
+            const file = e.target ? readerMap.get(e.target) : undefined;
+            if (file) {
+                const result = String(e.target?.result ?? '');
+                const stateLegal = e.type === 'load';
+                const sizeLegal = e.total < this.itemSize * Math.pow(2, 20);
+                const typeLegal = result.match(/^data:image\//);
+                const isSuccess = stateLegal && sizeLegal && typeLegal;
+                const image = template2dom(`
+                    <div class="${isSuccess ? '' : styles.error}" title="${file.detail.name}">
+                    ${isSuccess ? `<img src="${result}" alt="${file.detail.name}">` : ''}
+                    </div>
+                `);
+                if (!stateLegal) {
+                    file.error = new StateError('文件解析失败');
+                }
+                else if (!sizeLegal) {
+                    file.error = new SizeError('单个附件大小超过上限');
+                }
+                else if (!typeLegal) {
+                    file.error = new FileTypeError('无法接受非图片附件');
+                }
+                this.addEventListener(image, 'click', () => {
+                    this.files = this.files.filter(item => item !== file);
+                    this.updateImages();
+                });
+                wrap.appendChild(image);
+                appendLabel();
+            }
+            if (e.target) {
+                e.target.removeEventListener('load', addImage);
+                e.target.removeEventListener('error', addImage);
+                readerMap.delete(e.target);
+            }
+        };
+        this.files.forEach(file => {
+            const reader = new  FileReader();
+            readerMap.set(reader, file);
+            reader.addEventListener('load', addImage);
+            reader.addEventListener('error', addImage);
+            reader.readAsDataURL(file.detail);
+        });
+    }
+    setFiles(value: FileList|File[], append = true) {
+        if (!append) {
+            this.files = [];
+        } 
         for (const file of value) {
             if (this.files.length >= this.count) {
                 break;
@@ -71,47 +128,7 @@ export default class ImagesUpload {
             this.input.value = '';
         }
     }
-    updateImages() {
-        const wrap = this.el.getElementsByClassName(styles.image_row)[0];
-        wrap.innerHTML = '';
-        const appendLabel = () => {
-            if (this.files.length < this.count) {
-                wrap.appendChild(this.label);
-            }
-        };
-        appendLabel();
-        const addImage = function (this: ImagesUpload, file: ImageFile, e: ProgressEvent<FileReader>) {
-            const result = String(e.target?.result ?? '');
-            const stateLegal = e.type === 'load';
-            const sizeLegal = e.total < this.itemSize * Math.pow(2, 20);
-            const typeLegal = result.match(/^data:image\//);
-            const isSuccess = stateLegal && sizeLegal && typeLegal;
-            const image = template2dom(`
-                <div class="${isSuccess ? '' : styles.error}" title="${file.detail.name}">
-                ${isSuccess ? `<img src="${result}" alt="${file.detail.name}">` : ''}
-                </div>
-            `);
-            if (!stateLegal) {
-                file.error = new StateError('文件解析失败');
-            }
-            else if (!sizeLegal) {
-                file.error = new SizeError('单个附件大小超过上限');
-            }
-            else if (!typeLegal) {
-                file.error = new FileTypeError('无法接受非图片附件');
-            }
-            image.addEventListener('click', () => {
-                this.files = this.files.filter(item => item !== file);
-                this.updateImages();
-            });
-            wrap.appendChild(image);
-            appendLabel();
-        };
-        this.files.forEach(file => {
-            const reader = new  FileReader();
-            reader.readAsDataURL(file.detail);
-            reader.addEventListener('load', addImage.bind(this, file));
-            reader.addEventListener('error', addImage.bind(this, file));
-        });
+    unmounted() {
+        this.cleanEvent();
     }
 }
