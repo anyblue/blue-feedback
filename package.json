@@ -4,8 +4,8 @@
   "description": "a light user feedback UI SDK",
   "main": "index.js",
   "scripts": {
-    "dev": "webpack serve --open --mode=development",
-    "build": "webpack --mode=production",
+    "dev": "webpack serve --progress --open --mode development",
+    "build": "webpack --mode production",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

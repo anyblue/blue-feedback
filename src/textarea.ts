@@ -1,12 +1,14 @@
 import styles from './assets/css/index.less';
-import {template2dom} from './utils';
+import {template2dom, EventCleaner} from './utils';
 
-export default class Textarea {
+export default class Textarea extends EventCleaner {
     el: HTMLElement;
+    overflow = false;
     private readonly maxLength: number;
     private hint: HTMLElement|null;
     private textarea: HTMLTextAreaElement|null;
     constructor(params?: {placeholder?: string, maxLength?: number}) {
+        super();
         const hintContent = (value: number) => `${value} / ${params?.maxLength ?? 0}`;
         this.el = template2dom(`
             <div class="${styles.textarea}">
@@ -22,18 +24,20 @@ export default class Textarea {
         if (!this.textarea || !this.maxLength) {
             return;
         }
-        this.textarea.addEventListener('change', this.changeHanler);
-        this.textarea.addEventListener('input', this.changeHanler);
+        this.addEventListener(this.textarea, 'change', this.changeHanler);
+        this.addEventListener(this.textarea, 'input', this.changeHanler);
     }
-    setValue(value: string): void {
+    get value() {
+        return this.textarea?.value ?? '';
+    }
+    set value(value: string) {
         if (this.textarea) {
             this.textarea.value = value;
-            this.updateValue(value.length);
+            this.maxLength && this.updateValue(value.length);
         }
     }
     unmounted(): void {
-        this.textarea?.removeEventListener('change', this.changeHanler);
-        this.textarea?.removeEventListener('input', this.changeHanler);
+        this.cleanEvent();
     }
     private hintContent(value: number): string {
         return `${value} / ${this.maxLength}`;
@@ -48,11 +52,11 @@ export default class Textarea {
         }
         const elClassList = this.el.className.split(' ').map(item => item.trim());
         const errorIndex = elClassList.indexOf(styles.error);
-        const overflow = length > (this.maxLength ?? 0);
-        if (errorIndex !== -1 && !overflow) {
+        this.overflow = length > (this.maxLength ?? 0) && !!this.maxLength;
+        if (errorIndex !== -1 && !this.overflow) {
             elClassList.splice(errorIndex, 1);
         }
-        else if (errorIndex === -1 && overflow) {
+        else if (errorIndex === -1 && this.overflow) {
             elClassList.push(styles.error);
         }
         else {

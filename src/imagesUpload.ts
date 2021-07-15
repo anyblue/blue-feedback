@@ -92,6 +92,11 @@ export default class ImagesUpload extends EventCleaner {
         const readerMap = new Map<FileReader, ImageFile>();
         const addImage = (e: ProgressEvent<FileReader>) => {
             const file = e.target ? readerMap.get(e.target) : undefined;
+            if (e.target) {
+                e.target.removeEventListener('load', addImage);
+                e.target.removeEventListener('error', addImage);
+                readerMap.delete(e.target);
+            }
             if (file) {
                 const result = String(e.target?.result ?? '');
                 const stateLegal = e.type === 'load';
@@ -103,26 +108,21 @@ export default class ImagesUpload extends EventCleaner {
                     ${isSuccess ? `<img src="${result}" alt="${file.detail.name}">` : ''}
                     </div>
                 `);
-                if (!stateLegal) {
-                    file.error = new StateError('文件解析失败');
-                }
-                else if (!sizeLegal) {
-                    file.error = new SizeError('单个附件大小超过上限');
-                }
-                else if (!typeLegal) {
-                    file.error = new FileTypeError('无法接受非图片附件');
-                }
                 this.addEventListener(image, 'click', () => {
                     this.files = this.files.filter(item => item !== file);
                     this.updateImages();
                 });
                 wrap.appendChild(image);
                 appendLabel();
-            }
-            if (e.target) {
-                e.target.removeEventListener('load', addImage);
-                e.target.removeEventListener('error', addImage);
-                readerMap.delete(e.target);
+                if (!stateLegal) {
+                    this.emiterror(file.error = new StateError('文件解析失败'));
+                }
+                else if (!sizeLegal) {
+                    this.emiterror(file.error = new SizeError('单个附件大小超过上限'));
+                }
+                else if (!typeLegal) {
+                    this.emiterror(file.error = new FileTypeError('无法接受非图片附件'));
+                }
             }
         };
         this.files.forEach(file => {

@@ -36,7 +36,7 @@ export default class Modal extends EventCleaner {
 
         const content = this.el.querySelector(`.${styles.modal_content}`);
         this.imagesUpload = new ImagesUpload();
-        this.textarea = new Textarea({placeholder, maxLength: 20});
+        this.textarea = new Textarea({placeholder, maxLength: 2000});
         content?.appendChild(this.imagesUpload.el);
         content?.appendChild(this.textarea.el);
 
@@ -47,7 +47,7 @@ export default class Modal extends EventCleaner {
         document.body.style.position = '';
         this.el.className = `${styles.modal_wrap} ${styles.hidden}`;
         this.imagesUpload.setFiles([], false);
-        this.textarea.setValue('');
+        this.textarea.value = '';
     }
     show(): void {
         document.body.style.overflow = 'hidden';

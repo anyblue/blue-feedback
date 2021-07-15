@@ -4,6 +4,8 @@ export const template2dom = <T extends HTMLElement>(template: string): T => {
     wrap.innerHTML = template;
     return wrap.children[0] as T;
 };
+
+const errHandlers: Array<(e: Error) => unknown> = [];
 export abstract class EventCleaner {
     private readonly eventMap = new Map <HTMLElement, Set<{
         name: keyof HTMLElementEventMap;
@@ -16,11 +18,19 @@ export abstract class EventCleaner {
     ): void {
         el.addEventListener(name, cb);
         const events = this.eventMap.get(el);
+        const handler: typeof cb = e => {
+            try {
+                cb(e);
+            }
+            catch (error) {
+                this.emiterror(error);
+            }
+        };
         if (events) {
-            events.add({name, cb});
+            events.add({name, cb: handler});
         }
         else {
-            this.eventMap.set(el, new Set([{name, cb}]));
+            this.eventMap.set(el, new Set([{name, cb: handler}]));
         }
     }
     cleanEvent(): void {
@@ -30,5 +40,18 @@ export abstract class EventCleaner {
             }
         }
         this.eventMap.clear();
+    }
+    onerror(cb: (e: Error) => unknown) {
+        errHandlers.push(cb);
+    }
+    protected emiterror(error: Error) {
+        errHandlers.forEach(cb => {
+            try {
+                cb(error);
+            }
+            catch (e) {
+                // 避免回调中的异常影响分发
+            }
+        });
     }
 }
