@@ -1,8 +1,9 @@
 {
   "name": "blue-feedback",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "a light user feedback UI SDK",
-  "main": "index.js",
+  "main": "./dist/main.min.js",
+  "module": "./dist/main.min.js",
   "scripts": {
     "dev": "webpack serve --progress --open --mode development",
     "build": "webpack --mode production",

@@ -1,12 +1,16 @@
 import styles from './assets/css/index.less';
 import {template2dom, EventCleaner} from './utils';
 
+class OverflowError extends Error {
+    name = 'OverflowError';
+};
 export default class Textarea extends EventCleaner {
     el: HTMLElement;
     overflow = false;
     private readonly maxLength: number;
     private hint: HTMLElement|null;
     private textarea: HTMLTextAreaElement|null;
+    private changeCallback?: (err: Error|null, length: number) => unknown;
     constructor(params?: {placeholder?: string, maxLength?: number}) {
         super();
         const hintContent = (value: number) => `${value} / ${params?.maxLength ?? 0}`;
@@ -36,6 +40,9 @@ export default class Textarea extends EventCleaner {
             this.maxLength && this.updateValue(value.length);
         }
     }
+    onchange(cb: (err: Error|null, length: number) => unknown) {
+        this.changeCallback = cb;
+    }
     unmounted(): void {
         this.cleanEvent();
     }
@@ -53,6 +60,7 @@ export default class Textarea extends EventCleaner {
         const elClassList = this.el.className.split(' ').map(item => item.trim());
         const errorIndex = elClassList.indexOf(styles.error);
         this.overflow = length > (this.maxLength ?? 0) && !!this.maxLength;
+        this.changeCallback?.(this.overflow ? new OverflowError('超过字数限制') : null, length);
         if (errorIndex !== -1 && !this.overflow) {
             elClassList.splice(errorIndex, 1);
         }

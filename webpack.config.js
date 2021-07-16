@@ -29,11 +29,9 @@ module.exports = (env, argv) => {
         output: {
             clean: true,
             path: resolve('./dist'),
-            filename: 'js/[name].[chunkhash].min.js',
-            library: {
-                name: 'feedback',
-                type: 'umd',
-            }
+            filename: '[name].min.js',
+            library: 'Feedback',
+            libraryTarget: 'umd'
         },
         module: {
             rules: [

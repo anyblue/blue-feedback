@@ -25,6 +25,7 @@ export default class ImagesUpload extends EventCleaner {
     private readonly count: number;
     private readonly itemSize: number;
     private input?: HTMLInputElement;
+    private changeCallback?: (err: Error[]|null, length: number) => unknown;
     constructor(params?: {
         // 图片数量上限
         count: number;
@@ -60,6 +61,9 @@ export default class ImagesUpload extends EventCleaner {
             this.setFiles(files);
         });
         this.updateImages();
+    }
+    onchange(cb: (err: Error[]|null, length: number) => unknown) {
+        this.changeCallback = cb;
     }
     setFiles(value: FileList|File[], append = true): void {
         if (!append) {
@@ -124,6 +128,9 @@ export default class ImagesUpload extends EventCleaner {
                     this.emiterror(file.error = new FileTypeError('无法接受非图片附件'));
                 }
             }
+            if (wrap.children.length === this.files.length) {
+                this.emitchange();
+            }
         };
         this.files.forEach(file => {
             const reader = new FileReader();
@@ -132,5 +139,19 @@ export default class ImagesUpload extends EventCleaner {
             reader.addEventListener('error', addImage);
             reader.readAsDataURL(file.detail);
         });
+        if (!this.files.length) {
+            this.emitchange();
+        }
+    }
+    private emitchange() {
+        if (this.changeCallback) {
+            const errors = this.files.reduce((list, item) => {
+                if (item.error) {
+                    list.push(item.error);
+                }
+                return list;
+            }, [] as Error[]);
+            this.changeCallback(errors.length ? errors : null, this.files.length);
+        }
     }
 }

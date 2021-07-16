@@ -3,7 +3,7 @@ import {Dropdown, Option} from './dropdown';
 import {template2dom} from './utils';
 import styles from './assets/css/index.less';
 
-class Entry {
+export class Feedback {
     el = template2dom(`
         <div class="${styles.affix_wrap}">
             <div class="${styles.affix}">
@@ -68,4 +68,4 @@ class Entry {
     }
 }
 
-export default Entry;
+export default Feedback;
