@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "webpack serve --progress --open --mode development",
     "build": "webpack --mode production",
-    "release": "node scripts/release.js"
+    "release": "node scripts/release.js",
+    "commitlint": "node scripts/verify-commit.js"
   },
   "repository": {
     "type": "git",
@@ -30,6 +31,7 @@
     "eslint-loader": "^4.0.2",
     "execa": "^5.1.1",
     "html-webpack-plugin": "^5.3.2",
+    "husky": "^7.0.1",
     "less": "^4.1.1",
     "less-loader": "^10.0.1",
     "md5": "^2.3.0",
