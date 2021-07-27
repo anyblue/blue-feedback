@@ -17,30 +17,40 @@ export class Feedback {
         defaultToast?: boolean;
         bugModel?: boolean;
         featureModel?: boolean;
-    }) {
+        send?(type: 'bug'|'feature', data: FormData): Promise<any>;
+    } = {}) {
         const affix = this.el.querySelector(`.${styles.affix}`) as HTMLElement;
-        const options: Option[] = [
-            ...(params.helperUrl ? [{
+        const options: Option[] = [];
+        if (params.helperUrl) {
+            options.push({
                 text: '智能客服',
                 handler() {
                     params.helperUrl && (window.location.href = params.helperUrl);
                 },
-            }] : []),
-            ...(params.bugModel !== false ? [{
+            });
+        }
+        if (params.bugModel) {
+            const modal = new Modal(this.el, '问题报错', '请输入问题描述以及正确描述');
+            typeof params.send === 'function' && modal.onenter(params.send.bind(null, 'bug'));
+            options.push({
                 text: '问题报错',
-                modal: new Modal(this.el, '问题报错', '请输入问题描述以及正确描述'),
+                modal,
                 handler() {
                     this.modal?.show();
                 },
-            }] : []),
-            ...(params.featureModel !== false ? [{
+            });
+        }
+        if (params.featureModel) {
+            const modal = new Modal(this.el, '意见反馈', '请输入您的建议/反馈');
+            typeof params.send === 'function' && modal.onenter(params.send.bind(null, 'feature'));
+            options.push({
                 text: '意见反馈',
-                modal: new Modal(this.el, '意见反馈', '请输入您的建议/反馈'),
+                modal,
                 handler() {
                     this.modal?.show();
                 },
-            }] : []),
-        ];
+            });
+        }
         if (affix) {
             this.dropdown = new Dropdown(affix, options);
         }

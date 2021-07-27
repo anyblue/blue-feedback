@@ -2,12 +2,12 @@ import {template2dom, EventCleaner} from './utils';
 import ImagesUpload from './imagesUpload';
 import Textarea from './textarea';
 import styles from './assets/css/index.less';
-
+type EnterHandle = (data: FormData) => Promise<unknown>;
 export default class Modal extends EventCleaner {
     el: HTMLElement;
     private readonly imagesUpload: ImagesUpload;
     private readonly textarea: Textarea;
-
+    private enterHandle?: EnterHandle;
     constructor(wrap: HTMLElement, title: string, placeholder: string) {
         super();
         this.el = template2dom(`
@@ -89,10 +89,26 @@ export default class Modal extends EventCleaner {
         this.textarea.unmounted();
         this.cleanEvent();
     }
+    onenter(cb: EnterHandle): void {
+        this.enterHandle = cb;
+    }
     private cancle(): void {
         this.hidden();
     }
-    private enter(): void {
+    private async enter() {
+        try {
+            let formData = new window.FormData();
+            formData.append('adviceContent', this.textarea.value);
+            if (this.imagesUpload.files.length) {
+                this.imagesUpload.files.forEach((item, index) => {
+                    formData.append(`files[${index}]`, item.detail);
+                });
+            }
+            await this.enterHandle?.call(null, formData);
+        }
+        catch (e) {
+
+        }
         this.hidden();
     }
 }
