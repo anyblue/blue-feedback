@@ -1,6 +1,6 @@
 {
   "name": "blue-feedback",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "a light user feedback UI SDK",
   "main": "./dist/main.min.js",
   "module": "./dist/main.min.js",
