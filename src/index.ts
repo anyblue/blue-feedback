@@ -15,8 +15,8 @@ export class Feedback {
     constructor(params: {
         helperUrl?: string;
         defaultToast?: boolean;
-        bugModel?: boolean;
-        featureModel?: boolean;
+        bugModal?: boolean;
+        featureModal?: boolean;
         send?(type: 'bug'|'feature', data: FormData): Promise<any>;
     } = {}) {
         const affix = this.el.querySelector(`.${styles.affix}`) as HTMLElement;
@@ -29,7 +29,7 @@ export class Feedback {
                 },
             });
         }
-        if (params.bugModel) {
+        if (params.bugModal !== false) {
             const modal = new Modal(this.el, '问题报错', '请输入问题描述以及正确描述');
             typeof params.send === 'function' && modal.onenter(params.send.bind(null, 'bug'));
             options.push({
@@ -40,7 +40,7 @@ export class Feedback {
                 },
             });
         }
-        if (params.featureModel) {
+        if (params.featureModal !== false) {
             const modal = new Modal(this.el, '意见反馈', '请输入您的建议/反馈');
             typeof params.send === 'function' && modal.onenter(params.send.bind(null, 'feature'));
             options.push({

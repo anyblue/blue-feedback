@@ -12,7 +12,6 @@ class SizeError extends Error {
 class FileTypeError extends Error {
     name = 'FileTypeError';
 };
-
 interface ImageFile {
     detail: File;
     error?: Error;
@@ -94,11 +93,9 @@ export default class ImagesUpload extends EventCleaner {
         };
         appendLabel();
         const readerMap = new Map<FileReader, ImageFile>();
-        const addImage = (e: ProgressEvent<FileReader>) => {
+        const addImage = (index: number, e: ProgressEvent<FileReader>) => {
             const file = e.target ? readerMap.get(e.target) : undefined;
             if (e.target) {
-                e.target.removeEventListener('load', addImage);
-                e.target.removeEventListener('error', addImage);
                 readerMap.delete(e.target);
             }
             if (file) {
@@ -128,15 +125,21 @@ export default class ImagesUpload extends EventCleaner {
                     this.emiterror(file.error = new FileTypeError('无法接受非图片附件'));
                 }
             }
-            if (wrap.children.length === this.files.length) {
+            if (index === this.files.length - 1) {
                 this.emitchange();
             }
         };
-        this.files.forEach(file => {
+        this.files.forEach((file, index) => {
             const reader = new FileReader();
             readerMap.set(reader, file);
-            reader.addEventListener('load', addImage);
-            reader.addEventListener('error', addImage);
+            reader.addEventListener('load', function loadHandle(e: ProgressEvent<FileReader>) {
+                addImage(index, e);
+                reader.removeEventListener('load', loadHandle);
+            });
+            reader.addEventListener('error', function errorHandle(e: ProgressEvent<FileReader>) {
+                addImage(index, e);
+                reader.removeEventListener('error', errorHandle);
+            });
             reader.readAsDataURL(file.detail);
         });
         if (!this.files.length) {

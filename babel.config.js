@@ -6,5 +6,8 @@ module.exports = {
                 targets: '> 1%, last 2 versions'
             }
         ]
+    ],
+    plugins: [
+        '@babel/plugin-transform-runtime'
     ]
 };

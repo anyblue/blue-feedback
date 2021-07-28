@@ -42,31 +42,34 @@ export default class Modal extends EventCleaner {
 
         let filesError: Error[]|null = null;
         let textareaError: Error|null = null;
-        this.imagesUpload.onchange(err => {
-            filesError = err;
+        const checkError = () => {
             if (!enterBtn) {
                 return;
             }
-            if (textareaError || filesError?.length) {
+            if (textareaError || filesError?.length || !this.textarea.value.length) {
                 enterBtn.className = `${styles.button} ${styles.enter} ${styles.disabled}`;
             }
             else {
                 enterBtn.className = `${styles.button} ${styles.enter}`;
+            }
+        };
+        this.imagesUpload.onchange(err => {
+            try {
+                filesError = err;
+            }
+            finally {
+                checkError();
             }
         });
         this.textarea.onchange((err, length) => {
-            textareaError = err;
-            if (!enterBtn) {
-                return;
+            try {
+                textareaError = err;
+                if (!length) {
+                    textareaError = new Error('文字描述必填');
+                }
             }
-            if (!length) {
-                textareaError = new Error('文字描述必填');
-            }
-            if (textareaError || filesError?.length) {
-                enterBtn.className = `${styles.button} ${styles.enter} ${styles.disabled}`;
-            }
-            else {
-                enterBtn.className = `${styles.button} ${styles.enter}`;
+            finally {
+                checkError();
             }
         });
 
@@ -100,8 +103,8 @@ export default class Modal extends EventCleaner {
             let formData = new window.FormData();
             formData.append('adviceContent', this.textarea.value);
             if (this.imagesUpload.files.length) {
-                this.imagesUpload.files.forEach((item, index) => {
-                    formData.append(`files[${index}]`, item.detail);
+                this.imagesUpload.files.forEach(item => {
+                    formData.append('files', item.detail, item.detail.name);
                 });
             }
             await this.enterHandle?.call(null, formData);
