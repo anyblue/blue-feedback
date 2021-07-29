@@ -60,6 +60,7 @@ export default class Textarea extends EventCleaner {
         const elClassList = this.el.className.split(' ').map(item => item.trim());
         const errorIndex = elClassList.indexOf(styles.error);
         this.overflow = length > (this.maxLength ?? 0) && !!this.maxLength;
+        this.overflow && this.emiterror(new OverflowError('超过字数限制'));
         this.changeCallback?.(this.overflow ? new OverflowError('超过字数限制') : null, length);
         if (errorIndex !== -1 && !this.overflow) {
             elClassList.splice(errorIndex, 1);

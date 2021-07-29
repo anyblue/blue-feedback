@@ -19,7 +19,9 @@ export default class Modal extends EventCleaner {
                     </h3>
                     <div class="${styles.modal_content}" ></div>
                     <div class="${styles.modal_footer}">
-                        <button class="${`${styles.button} ${styles.enter} ${styles.disabled}`}">
+                        <button
+                            class="${`${styles.button} ${styles.enter}`}"
+                            disabled="disabled">
                         <svg width="16" height="16" viewBox="0 0 48 48" focusable="false">
                             <path
                                 d="M42 36.65a22 22 0 1 1 0-25.3"
@@ -58,32 +60,24 @@ export default class Modal extends EventCleaner {
                 return;
             }
             if (textareaError || filesError?.length || !this.textarea.value.length) {
-                enterBtn.className = `${styles.button} ${styles.enter} ${styles.disabled}`;
+                enterBtn.setAttribute('disabled', 'disabled');
             }
             else {
-                enterBtn.className = `${styles.button} ${styles.enter}`;
+                enterBtn.removeAttribute('disabled');
             }
         };
         this.imagesUpload.onchange(err => {
-            try {
-                filesError = err;
-            }
-            finally {
-                checkError();
-            }
+            filesError = err;
+            checkError();
         });
         this.textarea.onchange((err, length) => {
-            try {
-                textareaError = err;
-                if (!length) {
-                    textareaError = new Error('文字描述必填');
-                }
+            textareaError = err;
+            if (!length) {
+                textareaError = new Error('文字描述必填');
             }
-            finally {
-                checkError();
-            }
+            textareaError && this.emiterror(textareaError);
+            checkError();
         });
-
         wrap.appendChild(this.el);
     }
     hidden(): void {
@@ -113,6 +107,7 @@ export default class Modal extends EventCleaner {
         const enterBtn: HTMLElement|null = this.el.querySelector(`.${styles.button}.${styles.enter} `);
         if (enterBtn) {
             enterBtn.className = `${styles.button} ${styles.enter} ${styles.loading}`;
+            enterBtn.setAttribute('disabled', 'disabled');
         }
         try {
             let formData = new window.FormData();
@@ -127,6 +122,7 @@ export default class Modal extends EventCleaner {
         finally {
             if (enterBtn) {
                 enterBtn.className = `${styles.button} ${styles.enter}`;
+                enterBtn.removeAttribute('disabled');
             }
             this.hidden();
         }

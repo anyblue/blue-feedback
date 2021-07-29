@@ -109,8 +109,7 @@ body {
         background: @const-theme-color;
         border: 1px solid @const-theme-color;
         color: @const-white-color;
-        &.disabled,
-        &.loading {
+        &:disabled {
             background-color: #dbe4ff;
             border-color: #dbe4ff;
         }
@@ -118,8 +117,7 @@ body {
     &:not(.loading) svg {
         display: none;
     }
-    &.disabled,
-    &.loading {
+    &:disabled {
         cursor: not-allowed;
     }
     svg {
