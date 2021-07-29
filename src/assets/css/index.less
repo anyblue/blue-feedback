@@ -82,6 +82,12 @@ body {
     }
 }
 
+@keyframes loading {
+    0% {transform: rotate(0);}
+    50% {transform: rotate(180deg);}
+    85% {transform: rotate(320deg);}
+    100% {transform: rotate(360deg);}
+}
 .button {
     margin: 0 6px;
     width: 72px;
@@ -93,7 +99,7 @@ body {
     text-align: center;
     font-size: @font-size-normal;
     color: @font-black-color;
-    line-height: 18px;
+    line-height: 16px;
     font-weight: 400;
     cursor: pointer;
     &:hover {
@@ -103,13 +109,25 @@ body {
         background: @const-theme-color;
         border: 1px solid @const-theme-color;
         color: @const-white-color;
-        &.disabled {
+        &.disabled,
+        &.loading {
             background-color: #dbe4ff;
             border-color: #dbe4ff;
         }
     }
-    &.disabled {
+    &:not(.loading) svg {
+        display: none;
+    }
+    &.disabled,
+    &.loading {
         cursor: not-allowed;
+    }
+    svg {
+        width: 14px;
+        height: 14px;
+        vertical-align: middle;
+        margin-right: 5px;
+        animation: loading 1s linear 0s infinite;
     }
 }
 

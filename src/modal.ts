@@ -19,7 +19,18 @@ export default class Modal extends EventCleaner {
                     </h3>
                     <div class="${styles.modal_content}" ></div>
                     <div class="${styles.modal_footer}">
-                        <button class="${`${styles.button} ${styles.enter} ${styles.disabled}`}">确定</button>
+                        <button class="${`${styles.button} ${styles.enter} ${styles.disabled}`}">
+                        <svg width="16" height="16" viewBox="0 0 48 48" focusable="false">
+                            <path
+                                d="M42 36.65a22 22 0 1 1 0-25.3"
+                                stroke="currentColor"
+                                stroke-width="4"
+                                fill="none"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"></path>
+                        </svg>
+                        确定
+                        </button>
                         <button class="${styles.button}">取消</button>
                     </div>
                 </div>
@@ -99,6 +110,10 @@ export default class Modal extends EventCleaner {
         this.hidden();
     }
     private async enter() {
+        const enterBtn: HTMLElement|null = this.el.querySelector(`.${styles.button}.${styles.enter} `);
+        if (enterBtn) {
+            enterBtn.className = `${styles.button} ${styles.enter} ${styles.loading}`;
+        }
         try {
             let formData = new window.FormData();
             formData.append('adviceContent', this.textarea.value);
@@ -109,9 +124,11 @@ export default class Modal extends EventCleaner {
             }
             await this.enterHandle?.call(null, formData);
         }
-        catch (e) {
-
+        finally {
+            if (enterBtn) {
+                enterBtn.className = `${styles.button} ${styles.enter}`;
+            }
+            this.hidden();
         }
-        this.hidden();
     }
 }
