@@ -81,7 +81,7 @@ export default class ImagesUpload extends EventCleaner {
         }
     }
     unmounted(): void {
-        this.cleanEvent();
+        this.clearEvent();
     }
     private updateImages() {
         const wrap = this.el.getElementsByClassName(styles.image_row)[0];
@@ -105,7 +105,10 @@ export default class ImagesUpload extends EventCleaner {
                 const typeLegal = result.startsWith('data:image/');
                 const isSuccess = stateLegal && sizeLegal && typeLegal;
                 const image = template2dom(`
-                    <div class="${isSuccess ? '' : styles.error}" title="${file.detail.name}">
+                    <div
+                        class="${isSuccess ? '' : styles.error}"
+                        title="${file.detail.name}"
+                        data-index="${index}">
                     ${isSuccess ? `<img src="${result}" alt="${file.detail.name}">` : ''}
                     </div>
                 `);
@@ -126,6 +129,19 @@ export default class ImagesUpload extends EventCleaner {
                 }
             }
             if (index === this.files.length - 1) {
+                // 在最末图片添加后，对 wrap 下的图片按 data-index 排序，label 标签排最后
+                const children = new Array(...(wrap.children || []));
+                children.sort((pre, now) => {
+                    if (pre.tagName === 'LABEL') {
+                        return 1;
+                    }
+                    if (now.tagName === 'LABEL') {
+                        return -1;
+                    }
+                    return Number(pre.getAttribute('data-index')) - Number(now.getAttribute('data-index'));
+                });
+                wrap.innerHTML = '';
+                children.forEach(item => wrap.appendChild(item));
                 this.emitchange();
             }
         };

@@ -44,7 +44,7 @@ export default class Textarea extends EventCleaner {
         this.changeCallback = cb;
     }
     unmounted(): void {
-        this.cleanEvent();
+        this.clearEvent();
     }
     private hintContent(value: number): string {
         return `${value} / ${this.maxLength}`;

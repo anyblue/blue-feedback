@@ -33,7 +33,7 @@ export abstract class EventCleaner {
             this.eventMap.set(el, new Set([{name, cb: handler}]));
         }
     }
-    cleanEvent(): void {
+    clearEvent(): void {
         for (const [dom, events] of Array.from(this.eventMap)) {
             for (const {name, cb} of events) {
                 dom.removeEventListener(name, cb);

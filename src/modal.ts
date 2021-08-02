@@ -73,9 +73,8 @@ export default class Modal extends EventCleaner {
         this.textarea.onchange((err, length) => {
             textareaError = err;
             if (!length) {
-                textareaError = new Error('文字描述必填');
+                this.emiterror(textareaError = new Error('文字描述必填'));
             }
-            textareaError && this.emiterror(textareaError);
             checkError();
         });
         wrap.appendChild(this.el);
@@ -95,7 +94,7 @@ export default class Modal extends EventCleaner {
     unmounted(): void {
         this.imagesUpload.unmounted();
         this.textarea.unmounted();
-        this.cleanEvent();
+        this.clearEvent();
     }
     onenter(cb: EnterHandle): void {
         this.enterHandle = cb;

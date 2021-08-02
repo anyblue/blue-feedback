@@ -53,7 +53,7 @@ export class Dropdown extends EventCleaner {
         this.el.className = `${styles.dropdown} ${styles.show}`;
     }
     unmounted(): void {
-        this.cleanEvent();
+        this.clearEvent();
         this.option.forEach(item => {
             if (item.modal) {
                 item.modal.unmounted();
