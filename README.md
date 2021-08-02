@@ -1,7 +1,5 @@
 # blue-feedback
 
-[![NPM Version][npm-image]][npm-url]
-
 > 一个轻量的用户反馈UI插件。
 
 + **智能客服**：跳转链接，用于打开客服会话。
