@@ -72,8 +72,9 @@ export class Feedback {
     onerror(cb: (e: Error) => unknown) {
         this.dropdown?.onerror(cb);
     }
-    // 用于清除后代绑定的事件监听
-    unmounted(): void {
+    // 用于移除组件并清除后代绑定的事件
+    unmount(): void {
+        document.body.removeChild(this.el);
         this.dropdown?.unmounted();
     }
 }

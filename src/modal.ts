@@ -3,6 +3,9 @@ import ImagesUpload from './imagesUpload';
 import Textarea from './textarea';
 import styles from './assets/css/index.less';
 type EnterHandle = (data: FormData) => Promise<unknown>;
+class ValidateError extends Error {
+    name = 'ValidateError';
+};
 export default class Modal extends EventCleaner {
     el: HTMLElement;
     private readonly imagesUpload: ImagesUpload;
@@ -72,8 +75,8 @@ export default class Modal extends EventCleaner {
         });
         this.textarea.onchange((err, length) => {
             textareaError = err;
-            if (!length) {
-                this.emiterror(textareaError = new Error('文字描述必填'));
+            if (!length && ![...this.el.classList].includes(styles.hidden)) {
+                this.emiterror(textareaError = new ValidateError('文字描述必填'));
             }
             checkError();
         });
@@ -117,6 +120,9 @@ export default class Modal extends EventCleaner {
                 });
             }
             await this.enterHandle?.call(null, formData);
+        }
+        catch (e) {
+            this.emiterror(e);
         }
         finally {
             if (enterBtn) {

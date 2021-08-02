@@ -130,7 +130,7 @@ export default class ImagesUpload extends EventCleaner {
             }
             if (index === this.files.length - 1) {
                 // 在最末图片添加后，对 wrap 下的图片按 data-index 排序，label 标签排最后
-                const children = new Array(...(wrap.children || []));
+                const children = [...(wrap.children || [])];
                 children.sort((pre, now) => {
                     if (pre.tagName === 'LABEL') {
                         return 1;
