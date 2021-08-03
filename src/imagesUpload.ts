@@ -12,6 +12,10 @@ class SizeError extends Error {
 class FileTypeError extends Error {
     name = 'FileTypeError';
 };
+
+class OverflowError extends Error {
+    name = 'OverflowError';
+};
 interface ImageFile {
     detail: File;
     error?: Error;
@@ -68,14 +72,15 @@ export default class ImagesUpload extends EventCleaner {
         if (!append) {
             this.files = [];
         }
-        for (const file of value) {
-            if (this.files.length >= this.count) {
-                break;
+        if (value.length + this.files.length <= this.count) {
+            for (const file of value) {
+                this.files.push({detail: file});
             }
-            this.files.push({detail: file});
+            this.updateImages();
         }
-        this.files = this.files.slice(0, this.count);
-        this.updateImages();
+        else {
+            this.emiterror(new OverflowError('图片数量超过上限'));
+        }
         if (this.input) {
             this.input.value = '';
         }
@@ -86,81 +91,61 @@ export default class ImagesUpload extends EventCleaner {
     private updateImages() {
         const wrap = this.el.getElementsByClassName(styles.image_row)[0];
         wrap.innerHTML = '';
-        const appendLabel = () => {
-            if (this.files.length < this.count) {
-                wrap.appendChild(this.label);
-            }
-        };
-        appendLabel();
-        const readerMap = new Map<FileReader, ImageFile>();
-        const addImage = (index: number, e: ProgressEvent<FileReader>) => {
-            const file = e.target ? readerMap.get(e.target) : undefined;
-            if (e.target) {
-                readerMap.delete(e.target);
-            }
-            if (file) {
-                const result = String(e.target?.result ?? '');
-                const stateLegal = e.type === 'load';
-                const sizeLegal = e.total < this.itemSize * Math.pow(2, 20);
-                const typeLegal = result.startsWith('data:image/');
-                const isSuccess = stateLegal && sizeLegal && typeLegal;
-                const image = template2dom(`
-                    <div
-                        class="${isSuccess ? '' : styles.error}"
-                        title="${file.detail.name}"
-                        data-index="${index}">
-                    ${isSuccess ? `<img src="${result}" alt="${file.detail.name}">` : ''}
-                    </div>
-                `);
-                this.addEventListener(image, 'click', () => {
-                    this.files = this.files.filter(item => item !== file);
-                    this.updateImages();
-                });
-                wrap.appendChild(image);
-                appendLabel();
-                if (!stateLegal) {
-                    this.emiterror(file.error = new StateError('文件解析失败'));
-                }
-                else if (!sizeLegal) {
-                    this.emiterror(file.error = new SizeError('单个附件大小超过上限'));
-                }
-                else if (!typeLegal) {
-                    this.emiterror(file.error = new FileTypeError('无法接受非图片附件'));
-                }
-            }
-            if (index === this.files.length - 1) {
-                // 在最末图片添加后，对 wrap 下的图片按 data-index 排序，label 标签排最后
-                const children = [...(wrap.children || [])];
-                children.sort((pre, now) => {
-                    if (pre.tagName === 'LABEL') {
-                        return 1;
+        void Promise.allSettled(this.files.map(this.readImage.bind(this)))
+            .then(results => {
+                results.forEach(res => {
+                    if (res.status === 'fulfilled') {
+                        wrap.appendChild(res.value);
                     }
-                    if (now.tagName === 'LABEL') {
-                        return -1;
-                    }
-                    return Number(pre.getAttribute('data-index')) - Number(now.getAttribute('data-index'));
                 });
-                wrap.innerHTML = '';
-                children.forEach(item => wrap.appendChild(item));
+                if (this.files.length < this.count) {
+                    wrap.appendChild(this.label);
+                }
                 this.emitchange();
+            });
+    }
+    private readImage(img: ImageFile, index: number) {
+        const reader = new FileReader();
+        const addImage = (e: ProgressEvent<FileReader>) => {
+            const result = String(e.target?.result ?? '');
+            const stateLegal = e.type === 'load';
+            const sizeLegal = e.total < this.itemSize * Math.pow(2, 20);
+            const typeLegal = result.startsWith('data:image/');
+            const isSuccess = stateLegal && sizeLegal && typeLegal;
+            const image = template2dom(`
+                <div
+                    class="${isSuccess ? '' : styles.error}"
+                    title="${img.detail.name}"
+                    data-index="${index}">
+                ${isSuccess ? `<img src="${result}" alt="${img.detail.name}">` : ''}
+                </div>
+            `);
+            this.addEventListener(image, 'click', () => {
+                this.files = this.files.filter(item => item !== img);
+                this.updateImages();
+            });
+            if (!stateLegal) {
+                this.emiterror(img.error = new StateError('图片解析失败'));
             }
+            else if (!sizeLegal) {
+                this.emiterror(img.error = new SizeError('单个图片大小超过上限'));
+            }
+            else if (!typeLegal) {
+                this.emiterror(img.error = new FileTypeError('无法接受非图片附件'));
+            }
+            return image;
         };
-        this.files.forEach((file, index) => {
-            const reader = new FileReader();
-            readerMap.set(reader, file);
+        return new Promise<HTMLElement>(resolve => {
             reader.addEventListener('load', function loadHandle(e: ProgressEvent<FileReader>) {
-                addImage(index, e);
                 reader.removeEventListener('load', loadHandle);
+                resolve(addImage(e));
             });
             reader.addEventListener('error', function errorHandle(e: ProgressEvent<FileReader>) {
-                addImage(index, e);
                 reader.removeEventListener('error', errorHandle);
+                resolve(addImage(e));
             });
-            reader.readAsDataURL(file.detail);
+            reader.readAsDataURL(img.detail);
         });
-        if (!this.files.length) {
-            this.emitchange();
-        }
     }
     private emitchange() {
         if (this.changeCallback) {

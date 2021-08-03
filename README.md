@@ -61,9 +61,9 @@ feedback.onerror((e) => {
 + **onerror**：监听插件内产生的异常，可用于对接自定义toast
 #### 自定义异常
 + **StateError**：上传图片解析失败
-+ **SizeError**：单个文件大小超过上限
++ **SizeError**：单个图片大小超过上限
 + **FileTypeError**：上传非图片类型
-+ **OverflowError**：文字描述超过长度限制
++ **OverflowError**：文字描述超过长度限制 or 图片数量超过上限
 + **ValidateError**：未填写文字描述
 + ```send```函数产生的异常
 
