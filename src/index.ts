@@ -30,7 +30,7 @@ export class Feedback {
             });
         }
         if (params.bugModal !== false) {
-            const modal = new Modal(this.el, '问题报错', '请输入问题描述以及正确描述');
+            const modal = new Modal(this.el, '问题报错', '（必填）请输入问题描述以及正确描述');
             typeof params.send === 'function' && modal.onenter(params.send.bind(null, 'bug'));
             options.push({
                 text: '问题报错',
@@ -41,7 +41,7 @@ export class Feedback {
             });
         }
         if (params.featureModal !== false) {
-            const modal = new Modal(this.el, '意见反馈', '请输入您的建议/反馈');
+            const modal = new Modal(this.el, '意见反馈', '（必填）请输入您的建议/反馈');
             typeof params.send === 'function' && modal.onenter(params.send.bind(null, 'feature'));
             options.push({
                 text: '意见反馈',

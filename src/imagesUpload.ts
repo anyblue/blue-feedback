@@ -54,21 +54,21 @@ export default class ImagesUpload extends EventCleaner {
         this.addEventListener(this.input, 'change', (e: Event|{target?: HTMLInputElement}) => {
             const files = e.target
                 ? 'files' in e.target && e.target.files ? e.target.files : [] : [];
-            this.setFiles(files);
+            void this.setFiles(files);
         });
         // 禁止组件内的 dragover 的默认行为
         this.el.ondragover = () => false;
         this.addEventListener(this.label, 'drop', e => {
             e.preventDefault();
             const files = e.dataTransfer?.files ?? [];
-            this.setFiles(files);
+            void this.setFiles(files);
         });
-        this.updateImages();
+        void this.updateImages();
     }
     onchange(cb: (err: Error[]|null, length: number) => unknown) {
         this.changeCallback = cb;
     }
-    setFiles(value: FileList|File[], append = true): void {
+    async setFiles(value: FileList|File[], append = true) {
         if (!append) {
             this.files = [];
         }
@@ -76,7 +76,21 @@ export default class ImagesUpload extends EventCleaner {
             for (const file of value) {
                 this.files.push({detail: file});
             }
-            this.updateImages();
+            await this.updateImages();
+            // 报错优先级 SizeError > FileTypeError > StateError
+            const priority = ['SizeError', 'FileTypeError', 'StateError'];
+            const error = this.files.slice(-value.length).reduce((err, item) => {
+                if (item.error) {
+                    const errIndex = err ? priority.indexOf(err.name) : -1;
+                    if (errIndex < 0 || errIndex > priority.indexOf(item.error.name)) {
+                        return item.error;
+                    }
+                }
+                return err;
+            }, null as Error|null);
+            if (error) {
+                this.emiterror(error);
+            }
         }
         else {
             this.emiterror(new CountError('图片数量超过上限'));
@@ -88,21 +102,19 @@ export default class ImagesUpload extends EventCleaner {
     unmounted(): void {
         this.clearEvent();
     }
-    private updateImages() {
+    private async updateImages() {
         const wrap = this.el.getElementsByClassName(styles.image_row)[0];
         wrap.innerHTML = '';
-        void Promise.allSettled(this.files.map(this.readImage.bind(this)))
-            .then(results => {
-                results.forEach(res => {
-                    if (res.status === 'fulfilled') {
-                        wrap.appendChild(res.value);
-                    }
-                });
-                if (this.files.length < this.count) {
-                    wrap.appendChild(this.label);
-                }
-                this.emitchange();
-            });
+        const results = await Promise.allSettled(this.files.map(this.readImage.bind(this)));
+        results.forEach(res => {
+            if (res.status === 'fulfilled') {
+                wrap.appendChild(res.value);
+            }
+        });
+        if (this.files.length < this.count) {
+            wrap.appendChild(this.label);
+        }
+        this.emitchange();
     }
     private readImage(img: ImageFile, index: number) {
         const reader = new FileReader();
@@ -122,16 +134,16 @@ export default class ImagesUpload extends EventCleaner {
             `);
             this.addEventListener(image, 'click', () => {
                 this.files = this.files.filter(item => item !== img);
-                this.updateImages();
+                void this.updateImages();
             });
             if (!stateLegal) {
-                this.emiterror(img.error = new StateError('图片解析失败'));
-            }
-            else if (!sizeLegal) {
-                this.emiterror(img.error = new SizeError('单个图片大小超过上限'));
+                img.error = new StateError('图片解析失败');
             }
             else if (!typeLegal) {
-                this.emiterror(img.error = new FileTypeError('无法接受非图片附件'));
+                img.error = new FileTypeError('无法接受非图片附件');
+            }
+            else if (!sizeLegal) {
+                img.error = new SizeError('单个图片大小超过上限');
             }
             return image;
         };

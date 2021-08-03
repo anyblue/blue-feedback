@@ -86,7 +86,7 @@ export default class Modal extends EventCleaner {
         document.body.style.overflow = '';
         document.body.style.position = '';
         this.el.className = `${styles.modal_wrap} ${styles.hidden}`;
-        this.imagesUpload.setFiles([], false);
+        void this.imagesUpload.setFiles([], false);
         this.textarea.value = '';
     }
     show(): void {
