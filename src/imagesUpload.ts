@@ -13,8 +13,8 @@ class FileTypeError extends Error {
     name = 'FileTypeError';
 };
 
-class OverflowError extends Error {
-    name = 'OverflowError';
+class CountError extends Error {
+    name = 'CountError';
 };
 interface ImageFile {
     detail: File;
@@ -79,7 +79,7 @@ export default class ImagesUpload extends EventCleaner {
             this.updateImages();
         }
         else {
-            this.emiterror(new OverflowError('图片数量超过上限'));
+            this.emiterror(new CountError('图片数量超过上限'));
         }
         if (this.input) {
             this.input.value = '';

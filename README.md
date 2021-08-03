@@ -63,7 +63,8 @@ feedback.onerror((e) => {
 + **StateError**：上传图片解析失败
 + **SizeError**：单个图片大小超过上限
 + **FileTypeError**：上传非图片类型
-+ **OverflowError**：文字描述超过长度限制 or 图片数量超过上限
++ **CountError**：图片数量超过上限
++ **OverflowError**：文字描述超过长度限制
 + **ValidateError**：未填写文字描述
 + ```send```函数产生的异常
 
