@@ -1,36 +1,36 @@
 {
     "compilerOptions": {
-      "target": "esnext",
-      "module": "esnext",
-      "strict": true,
-      "jsx": "preserve",
-      "importHelpers": true,
-      "moduleResolution": "node",
-      "skipLibCheck": true,
-      "esModuleInterop": true,
-      "allowSyntheticDefaultImports": true,
-      "sourceMap": true,
-      "baseUrl": ".",
-      "types": [
-        "node"
-      ],
-      "paths": {
-        "@/*": ["src/*"],
-        "*": ["*", "src/*"]
-      },
-      "lib": [
-        "esnext",
-        "dom",
-        "dom.iterable",
-        "scripthost"
-      ]
+        "target": "esnext",
+        "module": "esnext",
+        "strict": true,
+        "jsx": "preserve",
+        "importHelpers": true,
+        "moduleResolution": "node",
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "sourceMap": true,
+        "baseUrl": ".",
+        "types": [
+            "node"
+        ],
+        "paths": {
+            "@/*": ["src/*"],
+            "*": ["*", "src/*"]
+        },
+        "lib": [
+            "esnext",
+            "dom",
+            "dom.iterable",
+            "scripthost"
+        ]
     },
     "include": [
-      "src/**/*.ts",
-      "src/**/*.d.ts",
-      "example/**/*.ts",
+        "src/**/*.ts",
+        "src/**/*.d.ts",
+        "example/**/*.ts",
     ],
     "exclude": [
-      "node_modules"
+        "node_modules"
     ]
-  }
+}

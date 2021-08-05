@@ -1,12 +1,13 @@
-var path = require('path');
+const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-var md5 = require('md5');
+const md5 = require('md5');
 
-var affix = md5(path.parse(__dirname)).slice(0, 5); // 将目录名md5作为CssModule的后缀
+const affix = md5(path.parse(__dirname)).slice(0, 5); // 将目录名md5作为CssModule的后缀
 
 function resolve(dir) {
     return path.join(__dirname, dir);
 }
+
 module.exports = (env, argv) => {
     const isDev = argv.mode === 'development';
     return {
@@ -25,13 +26,17 @@ module.exports = (env, argv) => {
         ],
         resolve: {
             extensions: ['.ts', '.js'],
+            alias: {
+                '@': resolve('src'),
+                'src': resolve('src'),
+            },
         },
         output: {
             clean: true,
             path: resolve('./dist'),
             filename: '[name].min.js',
             library: 'Feedback',
-            libraryTarget: 'umd'
+            libraryTarget: 'umd',
         },
         module: {
             rules: [
@@ -44,8 +49,8 @@ module.exports = (env, argv) => {
                     test: /\.js$/i,
                     exclude: /(node_modules)/,
                     use: {
-                      loader: 'babel-loader'
-                    }
+                        loader: 'babel-loader',
+                    },
                 },
                 {
                     test: /\.less$/i,
@@ -56,11 +61,11 @@ module.exports = (env, argv) => {
                             options: {
                                 modules: {
                                     localIdentName: `blue_[local]_${affix}`,
-                                }
-                            }
+                                },
+                            },
                         },
-                        'less-loader'
-                    ]
+                        'less-loader',
+                    ],
                 },
                 {
                     test: /\.css$/i,
@@ -71,17 +76,16 @@ module.exports = (env, argv) => {
                             options: {
                                 modules: {
                                     localIdentName: `blue_[local]_${affix}`,
-                                }
-                            }
-                        }
-                    ]
+                                },
+                            },
+                        },
+                    ],
                 },
                 {
                     test: /\.(png|svg|jpg|jpeg|gif)$/i,
                     type: 'asset',
                 },
             ],
-        }
+        },
     };
 };
-  

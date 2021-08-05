@@ -3,4 +3,4 @@ module.exports = {
         '@ecomfe/eslint-config',
         '@ecomfe/eslint-config/typescript/strict',
     ],
-}
+};

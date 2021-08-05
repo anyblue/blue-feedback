@@ -3,11 +3,11 @@ module.exports = {
         [
             '@babel/preset-env',
             {
-                targets: '> 1%, last 2 versions'
-            }
-        ]
+                targets: '> 1%, last 2 versions',
+            },
+        ],
     ],
     plugins: [
-        '@babel/plugin-transform-runtime'
-    ]
+        '@babel/plugin-transform-runtime',
+    ],
 };

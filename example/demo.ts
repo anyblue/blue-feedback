@@ -1,3 +1,3 @@
-// import Feedback from '../';
-import Feedback from '../src';
-console.log(new Feedback());
+import Feedback from 'src';
+
+console.info(new Feedback());
