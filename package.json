@@ -1,12 +1,13 @@
 {
   "name": "blue-feedback",
-  "version": "0.2.8",
+  "version": "0.3.0",
   "description": "a light user feedback UI SDK",
   "main": "./dist/main.min.js",
   "module": "./dist/main.min.js",
   "scripts": {
     "dev": "webpack serve --progress --open --mode development",
     "build": "webpack --mode production",
+    "deploy": "webpack --mode development",
     "release": "npm run build && node scripts/release.js",
     "commitlint": "node scripts/verify-commit.js"
   },
@@ -27,7 +28,7 @@
     "@typescript-eslint/eslint-plugin": "^4.28.3",
     "@typescript-eslint/parser": "^4.28.3",
     "babel-loader": "^8.2.2",
-    "chalk": "^2.4.2",
+    "chalk": "^4.1.2",
     "css-loader": "^5.2.6",
     "enquirer": "^2.3.6",
     "eslint": "^7.30.0",
