@@ -1,4 +1,5 @@
 import styles from './assets/css/index.less';
+import toastStyles from './assets/css/errorToast.less';
 
 import Modal, {Params as ModalOpt} from './modal';
 import {Dropdown, Option} from './dropdown';
@@ -30,7 +31,7 @@ export class Feedback {
             </div>
         </div>
     `);
-    private readonly dropdown?: Dropdown;
+    private readonly dropdown: Dropdown;
     constructor(params: Params) {
         const affix = this.el.querySelector(`.${styles.affix}`) as HTMLElement;
         const options = params.option.reduce((list, item) => {
@@ -65,20 +66,18 @@ export class Feedback {
             }
             return list;
         }, [] as Option[]);
-        if (affix) {
-            this.dropdown = new Dropdown(affix, options);
-        }
-        this.dropdown?.onerror(e => {
+        this.dropdown = new Dropdown(affix, options);
+        this.dropdown.onerror(e => {
             const errMessage = params.toast?.(e) ?? e.message;
             if (errMessage !== false) {
                 const toast = template2dom(`
-                    <div class="${styles.error_toast} ${styles.hidden}">
+                    <div class="${toastStyles.error_toast} ${toastStyles.hidden}">
                         ${String(errMessage)}
                     </div>
                 `);
                 this.el.appendChild(toast);
                 window.requestAnimationFrame(() => {
-                    toast.className = styles.error_toast;
+                    toast.className = toastStyles.error_toast;
                 });
                 setTimeout(() => {
                     this.el.removeChild(toast);
@@ -91,7 +90,7 @@ export class Feedback {
     // 用于移除组件并清除后代绑定的事件
     unmount(): void {
         document.body.removeChild(this.el);
-        this.dropdown?.unmounted();
+        this.dropdown.unmounted();
     }
 }
 

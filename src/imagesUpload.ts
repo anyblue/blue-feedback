@@ -78,7 +78,7 @@ export default class ImagesUpload extends EventCleaner {
             const error = this.files.slice(-value.length).reduce((err, item) => {
                 const preIndex = err ? priority.indexOf(err.name) : -1;
                 const itemIndex = item.error ? priority.indexOf(item.error.name) : -1;
-                if (item.error && itemIndex >= 0 && itemIndex < preIndex) {
+                if (item.error && itemIndex >= 0 && (itemIndex < preIndex || preIndex < 0)) {
                     return item.error;
                 }
                 return err;

@@ -10,7 +10,6 @@
 
 
 ## Feature
-+ 更新README
 + typescript环境支持
 
 
@@ -23,29 +22,40 @@ npm install blue-feedback --save
 ## Demo
 ```javascript
 const feedback = new Feedback({
-  // defaultToast: false, // 禁用内置toast
+  option: [
+    {
+      type: 'modal',
+      title: '问题报错',
+      img: {
+        label: '问题图片',
+        count: 4,
+        itemSize: 2,
+      },
+      text: {
+        label: '问题描述',
+        placeholder: '请输入问题描述以及正确描述',
+        maxLength: 2000,
+      },
+    }
+  ],
   async send (type, formData) {
     formData.append('type', type);
     await sendApi(formData); // 提交请求函数
   }
-});
-feedback.onerror((e) => {
-  toast.error(e.message); // 使用自定义toast
 });
 ```
 
 
 ## APIs
 ### 配置项
-配置项均为**可选项**
 
-| 名称               | 类型                                                         | 说明                                 |
-| ------------------ | ------------------------------------------------------------ | ------------------------------------ |
-| ```helperUrl```    | string                                                       | 需要『智能客服』时，传入跳转 url     |
-| ```defaultToast``` | boolean                                                      | 是否需要内置 toast ，默认```true```  |
-| ```bugModal```     | boolean                                                      | 是否需要『问题报错』，默认```true``` |
-| ```featureModal``` | boolean                                                      | 是否需要『意见反馈』，默认```true``` |
-| ```send```         | (*type*: 'bug'\|'feature', *data*: *FormData*): *Promise*<*any*> | 提交函数                             |
+| 名称            | 类型                                                         | 必选 | 说明                                                         |
+| --------------- | ------------------------------------------------------------ | ---- | ------------------------------------------------------------ |
+| ```helperUrl``` | string                                                       | 否   | 需要『智能客服』时，传入跳转 url                             |
+| ```toast```     | (e: Error) => string\|false\|void                            | 否   | 用于定制toast，返回```false```禁止默认toast；返回```void```使用默认toast行为；返回```string```修改toast信息 |
+| ```send```      | (*type*: 'bug'\|'feature', *data*: *FormData*): *Promise*<*any*> | 否   | 提交函数                                                     |
+| option          | Array<Link\|Modal>                                           | 是   | 菜单配置项                                                   |
+
 + **send.args[0] type**：触发提交的窗口，『问题报错』为 ```'bug'```，『意见反馈』为 ```'feature'```
 + **send.args[0] data**：提交内容的FormData
 
@@ -53,6 +63,23 @@ feedback.onerror((e) => {
 | ------------------- | ------ | ------------------ |
 | ```adviceContent``` | string | 文本描述           |
 | ```files```         | File   | 【可选】多图片上传 |
+
+### option
+#### option.Link[type="link"]
++ **title**：必填，页签标题
++ **url**：必填，页签跳转地址
+#### option.Modal[type="modal"]
++ **title**：必填，页签标题
++ **value**：默认值同```title```，对应 send.args[0] 
++ **img**：可选，上传图片配置，为```true```时，应用默认值
+  + **默认值**：{label: '上传图片', count: 4, itemSize: 2}
+  + **label**：表单文案
+  + **count**：图片个数限制
+  + **itemSize**：单个图片的大小限制（单位：MB）
++ **text**：默认值{label: '文字描述'}，文本框配置
+  + **label**：表单文案
+  + **placeholder**：文本框提示文案
+  + **maxLength**：最长字数限制
 
 ### 实例方法
 + **el**：插件的根DOM节点
@@ -67,6 +94,4 @@ feedback.onerror((e) => {
 + **OverflowError**：文字描述超过长度限制
 + ```send```函数产生的异常
 
-
 ## History
-
