@@ -1,0 +1,81 @@
+@import url('./config.less');
+
+.upload {
+    margin-bottom: 20px;
+    border: 1px dashed #CCCCCC;
+    border-radius: 4px;
+    height:  116px;
+    padding-top: 16px;
+    .image_row {
+        display: flex;
+        label {
+            border: 1px solid @border-color;
+            background: url('../images/image_add.svg') center/22px no-repeat;
+            cursor: pointer;
+        }
+        div,
+        label {
+            margin-left: 16px;
+            width: 80px;
+            height: 80px;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        div {
+            &:hover::before,
+            &:hover::after {
+                content: '';
+                display: block;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+            }
+            &:hover::before {
+                background: rgba(0, 0, 0, .7);
+            }
+            &:hover::after {
+                background-size: 22px 22px;
+                background: url('../images/delete.svg') center no-repeat;
+            }
+            &.error {
+                background-size: 22px 22px;
+                background: url('../images/image_error.svg') center no-repeat;
+                border: 1px solid @border-red-color;
+                img {
+                    display: none;
+                }
+            }
+            img {
+                width: 100%;
+                height: 100%;
+            }
+        }
+    }
+    .placeholder {
+        font-size: @font-size-normal;
+        text-align: center;
+        font-weight: 400;
+        &.hidden {
+            display: none;
+        }
+        label {
+            display: block;
+            width: 32px;
+            height: 32px;
+            margin: 0 auto 8px;
+            background: url('../images/image_add.svg') center/contain no-repeat;
+            cursor: pointer;
+        }
+        .title {
+            color: @font-black-color;
+            line-height: 20px;
+        }
+        .description {
+            color: @font-placeholder-color;
+            line-height: 18px;
+        }
+    }
+}

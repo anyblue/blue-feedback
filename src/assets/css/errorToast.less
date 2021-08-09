@@ -1,0 +1,33 @@
+@import url('./config.less');
+
+.error_toast {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, 10px);
+    border-radius: @border-radius;
+    padding: 7px 16px 7px 38px;
+    background: @const-white-color;
+    font-size: @font-size-sub;
+    color: @font-black-color;
+    line-height: 22px;
+    font-weight: 400;
+    z-index: @z-index-top;
+    transition: all .5s ease;
+    &.hidden {
+        transform: translate(-50%, -36px);
+        opacity: .4;
+        display: block;
+    }
+    &::before {
+        content: '';
+        display: block;
+        position: absolute;
+        top: 11px;
+        left: 16px;
+        width: 14px;
+        height: 14px;
+        background: url('../images/error.svg') no-repeat;
+        background-size: 100% 100%;
+    }
+}

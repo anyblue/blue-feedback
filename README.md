@@ -6,10 +6,11 @@
 + **问题报错**：提交各种系统异常（bug）的描述以及图片说明（可选）。
 + **意见反馈**：提交用户意见（feature）以及图片说明（可选）。
 
-<img src="https://github.com/anyblue/blue-feedback/blob/main/preview.png" alt="预览" style="zoom:70%;" />
+<img src="https://github.com/anyblue/blue-feedback/blob/main/example/preview.png" alt="预览" style="zoom:70%;" />
 
 
 ## Feature
++ 更新README
 + typescript环境支持
 
 
@@ -65,7 +66,6 @@ feedback.onerror((e) => {
 + **FileTypeError**：上传非图片类型
 + **CountError**：图片数量超过上限
 + **OverflowError**：文字描述超过长度限制
-+ **ValidateError**：未填写文字描述
 + ```send```函数产生的异常
 
 

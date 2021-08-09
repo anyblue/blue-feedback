@@ -16,7 +16,7 @@
         ],
         "paths": {
             "@/*": ["src/*"],
-            "*": ["*", "src/*"]
+            "src/*": ["src/*"],
         },
         "lib": [
             "esnext",
@@ -26,9 +26,10 @@
         ]
     },
     "include": [
-        "src/**/*.ts",
-        "src/**/*.d.ts",
-        "example/**/*.ts",
+      "src/**/*.ts",
+      "src/**/*.d.ts",
+      "example/**/*.ts",
+      "shims.d.ts",
     ],
     "exclude": [
         "node_modules"

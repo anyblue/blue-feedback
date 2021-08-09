@@ -1,8 +1,8 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const md5 = require('md5');
-
-const affix = md5(path.parse(__dirname)).slice(0, 5); // 将目录名md5作为CssModule的后缀
+const {name} = require('./package.json');
+const affix = md5(path.parse(name)).slice(0, 5); // 将目录名md5作为CssModule的后缀
 
 function resolve(dir) {
     return path.join(__dirname, dir);
@@ -11,7 +11,6 @@ function resolve(dir) {
 module.exports = (env, argv) => {
     const isDev = argv.mode === 'development';
     return {
-        // todo: 切换本地调试入口
         entry: isDev ? resolve('./example/demo.ts') : resolve('./src/index.ts'),
         devServer: {
             contentBase: resolve('./dist'),
@@ -53,7 +52,7 @@ module.exports = (env, argv) => {
                     },
                 },
                 {
-                    test: /\.less$/i,
+                    test: /\.(less|css)$/i,
                     use: [
                         'style-loader',
                         {
@@ -65,20 +64,6 @@ module.exports = (env, argv) => {
                             },
                         },
                         'less-loader',
-                    ],
-                },
-                {
-                    test: /\.css$/i,
-                    use: [
-                        'style-loader',
-                        {
-                            loader: 'css-loader',
-                            options: {
-                                modules: {
-                                    localIdentName: `blue_[local]_${affix}`,
-                                },
-                            },
-                        },
                     ],
                 },
                 {

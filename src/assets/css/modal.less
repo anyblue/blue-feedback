@@ -1,0 +1,131 @@
+@import url('./config.less');
+
+.modal_wrap {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: @background-mask-color;
+    z-index: @z-index-middle;
+    &.hidden {
+        display: none;
+    }
+    &.show {
+        display: block;
+    }
+    .modal{
+        position: absolute;
+        width: 532px;
+        top: 50%;
+        left: 50%;
+        background: @const-white-color;
+        border-radius: 4px;
+        transform: translate(-50%, -50%);
+        &_header {
+            height: 40px;
+            padding-top: 16px;
+            line-height: 22px;
+            color: @const-black-color;
+            margin: 0;
+            padding-left: 24px;
+            font-weight: 500;
+            font-size: @font-size-sub;
+            position: relative;
+            .close_btn {
+                position: absolute;
+                top: 16px;
+                right: 24px;
+                width: 10px;
+                height: 10px;
+                background-image: url('../images/close.png');
+                background-size: cover;
+                background-position: -16.25px 0px;
+                cursor: pointer;
+                &:hover {
+                    background-position: 0px 0px;
+                }
+            }
+        }
+        &_footer {
+            height: 40px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        &_content {
+            padding: 20px 24px 10px;
+            .form_row {
+                display: flex;
+                & > label {
+                    flex: 58px 0 0;
+                    margin-right: 16px;;
+                    text-align: right;
+                    color: #666;
+                    line-height: 18px;
+                    font-size: @font-size-normal;
+                    font-weight: 400;
+                    &.required::before {
+                        content: '*';
+                        color: #E64552 ;
+                    }
+                    + * {
+                        flex-grow: 1;
+                    }
+                }
+            }
+        }
+    }
+}
+
+@keyframes loading {
+    0% {transform: rotate(0);}
+    50% {transform: rotate(180deg);}
+    85% {transform: rotate(320deg);}
+    100% {transform: rotate(360deg);}
+}
+
+.button {
+    margin: 0 6px;
+    width: 72px;
+    height: 28px;
+    background: @const-white-color;
+    border: 1px solid @border-color;
+    border-radius: @border-radius;
+    padding: 5px 0;
+    text-align: center;
+    font-size: @font-size-normal;
+    color: @font-black-color;
+    line-height: 16px;
+    font-weight: 400;
+    cursor: pointer;
+    &:hover {
+        background: @background-gray-color;
+    }
+    &.enter {
+        background: @const-theme-color;
+        border: 1px solid @const-theme-color;
+        color: @const-white-color;
+        &:disabled {
+            background-color: #dbe4ff;
+            border-color: #dbe4ff;
+        }
+    }
+    &:not(.loading) svg {
+        display: none;
+    }
+    &:disabled {
+        cursor: not-allowed;
+    }
+    svg {
+        width: 14px;
+        height: 14px;
+        vertical-align: middle;
+        margin-right: 5px;
+        animation: loading 1s linear 0s infinite;
+    }
+}
+

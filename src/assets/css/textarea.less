@@ -1,0 +1,53 @@
+@import url('./config.less');
+
+.textarea {
+    height: 108px;
+    position: relative;
+    & &_hint {
+        position: absolute;
+        right: 16px;
+        bottom: 9px;
+        background: rgba(102,102,102,0.8);
+        padding: 0 4px;
+        border-radius: 2px;
+        font-size: @font-size-normal;
+        font-weight: 400;
+    }
+    textarea{
+        resize: none;
+        width: 100%;
+        height: 100%;
+        padding: 5px 12px;
+        border: 1px solid #e0e0e0;
+        background-color: @const-white-color;
+        border-radius: @border-radius;
+        line-height: 1.5;
+        font-size: @font-size-normal;
+        font-family: "PingFang SC", "Helvetica Neue", "Hiragino Sans GB", "Microsoft YaHei", Arial, SimSun, sans-serif;
+        &:focus {
+            outline: none;
+            border-color: @const-theme-color;
+            box-shadow: 0 0 0 2px rgb(76 132 255 / 20%);
+        }
+        &::-webkit-input-placeholder { /* WebKit browsers */
+            color: @font-placeholder-color;
+        }
+          
+        &::-moz-placeholder { /* Mozilla Firefox 19+ */
+            color: @font-placeholder-color;
+        }
+          
+        &:-ms-input-placeholder { /* Internet Explorer 10+ */
+            color: @font-placeholder-color;
+        } 
+    }
+    &.error textarea {
+        border-color: #e64552;
+    }
+    &.error textarea:focus {
+        box-shadow: 0 0 0 2px rgb(230 69 82 / 20%);
+    }
+    &.error .textarea_hint {
+        background: rgba(230,69,82,.8);
+    }
+}

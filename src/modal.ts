@@ -1,23 +1,43 @@
-import {template2dom, EventCleaner} from './utils';
-import ImagesUpload from './imagesUpload';
-import Textarea from './textarea';
-import styles from './assets/css/index.less';
+import {template2dom, EventCleaner} from './utils/utils';
+import {ValidateError} from './utils/error';
+import ImagesUpload, {Params as ImageOpt} from './imagesUpload';
+import Textarea, {Params as TextOpt} from './textarea';
+
+import styles from './assets/css/modal.less';
+
 type EnterHandle = (data: FormData) => Promise<unknown>;
-class ValidateError extends Error {
-    name = 'ValidateError';
+
+interface Label {
+    label?: string;
+}
+export interface Params {
+    title: string;
+    img?: ImageOpt&Label;
+    text?: TextOpt&Label;
+}
+
+const formRow = (el: HTMLElement, label: string, required?: boolean) => {
+    const row = template2dom(`
+        <div class="${styles.form_row}">
+            <label class="${required ? styles.required : ''}">${label}</label>
+        </div>
+    `);
+    row.appendChild(el);
+    return row;
 };
+
 export default class Modal extends EventCleaner {
     el: HTMLElement;
-    private readonly imagesUpload: ImagesUpload;
+    private readonly imagesUpload?: ImagesUpload;
     private readonly textarea: Textarea;
     private enterHandle?: EnterHandle;
-    constructor(wrap: HTMLElement, title: string, placeholder: string) {
+    constructor(wrap: HTMLElement, params: Params) {
         super();
         this.el = template2dom(`
             <div class="${`${styles.modal_wrap} ${styles.hidden}`}">
                 <div class="${styles.modal}">
                     <h3 class="${styles.modal_header}">
-                        ${title}
+                        ${params.title}
                         <i class="${styles.close_btn}"></i>
                     </h3>
                     <div class="${styles.modal_content}" ></div>
@@ -51,13 +71,12 @@ export default class Modal extends EventCleaner {
         enterBtn && this.addEventListener(enterBtn, 'click', this.enter.bind(this));
 
         const content = this.el.querySelector(`.${styles.modal_content}`);
-        this.imagesUpload = new ImagesUpload();
-        this.textarea = new Textarea({placeholder, maxLength: 2000});
-        content?.appendChild(this.imagesUpload.el);
-        content?.appendChild(this.textarea.el);
+
 
         let filesError: Error[]|null = null;
         let textareaError: Error|null = null;
+
+        this.textarea = new Textarea(params.text);
         const checkError = () => {
             if (!enterBtn) {
                 return;
@@ -69,24 +88,30 @@ export default class Modal extends EventCleaner {
                 enterBtn.removeAttribute('disabled');
             }
         };
-        this.imagesUpload.onchange(err => {
-            filesError = err;
-            checkError();
-        });
         this.textarea.onchange((err, length) => {
             textareaError = err;
             if (!length && ![...this.el.classList].includes(styles.hidden)) {
-                this.emiterror(textareaError = new ValidateError('文字描述必填'));
+                textareaError = new ValidateError('文字描述必填');
             }
             checkError();
         });
+
+        if (params.img) {
+            this.imagesUpload = new ImagesUpload(params.img);
+            content?.appendChild(formRow(this.imagesUpload.el, params.img?.label ?? '上传图片'));
+            this.imagesUpload.onchange(err => {
+                filesError = err;
+                checkError();
+            });
+        }
+        content?.appendChild(formRow(this.textarea.el, params.text?.label ?? '文字描述', true));
         wrap.appendChild(this.el);
     }
     hidden(): void {
         document.body.style.overflow = '';
         document.body.style.position = '';
         this.el.className = `${styles.modal_wrap} ${styles.hidden}`;
-        void this.imagesUpload.setFiles([], false);
+        void this.imagesUpload?.setFiles([], false);
         this.textarea.value = '';
     }
     show(): void {
@@ -95,7 +120,7 @@ export default class Modal extends EventCleaner {
         this.el.className = `${styles.modal_wrap} ${styles.show}`;
     }
     unmounted(): void {
-        this.imagesUpload.unmounted();
+        this.imagesUpload?.unmounted();
         this.textarea.unmounted();
         this.clearEvent();
     }
@@ -114,7 +139,7 @@ export default class Modal extends EventCleaner {
         try {
             let formData = new window.FormData();
             formData.append('adviceContent', this.textarea.value);
-            if (this.imagesUpload.files.length) {
+            if (this.imagesUpload?.files.length) {
                 this.imagesUpload.files.forEach(item => {
                     formData.append('files', item.detail, item.detail.name);
                 });

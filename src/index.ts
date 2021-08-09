@@ -1,56 +1,70 @@
-import Modal from './modal';
-import {Dropdown, Option} from './dropdown';
-import {template2dom} from './utils';
 import styles from './assets/css/index.less';
 
+import Modal, {Params as ModalOpt} from './modal';
+import {Dropdown, Option} from './dropdown';
+import {template2dom} from './utils/utils';
+
+interface EntryOpt_Link {
+    type: 'link';
+    title: string;
+    url: string;
+}
+interface EntryOpt_Modal {
+    type: 'modal';
+    title: string;
+    value?: string;
+    img?: Required<ModalOpt>['img']|true;
+    text?: Required<ModalOpt>['text'];
+}
+
+export interface Params {
+    defaultToast?: boolean;
+    option: Array<EntryOpt_Link|EntryOpt_Modal>;
+    send?(type: string, data: FormData): Promise<any>;
+}
 export class Feedback {
     el = template2dom(`
         <div class="${styles.affix_wrap}">
             <div class="${styles.affix}">
-                <span>咨<br/>询</span>
+                <span>咨询</span>
             </div>
         </div>
     `);
     private readonly dropdown?: Dropdown;
-    constructor(params: {
-        helperUrl?: string;
-        defaultToast?: boolean;
-        bugModal?: boolean;
-        featureModal?: boolean;
-        send?(type: 'bug'|'feature', data: FormData): Promise<any>;
-    } = {}) {
+    constructor(params: Params) {
         const affix = this.el.querySelector(`.${styles.affix}`) as HTMLElement;
-        const options: Option[] = [];
-        if (params.helperUrl) {
-            options.push({
-                text: '智能客服',
-                handler() {
-                    params.helperUrl && (window.location.href = params.helperUrl);
-                },
-            });
-        }
-        if (params.bugModal !== false) {
-            const modal = new Modal(this.el, '问题报错', '（必填）请输入问题描述以及正确描述');
-            typeof params.send === 'function' && modal.onenter(params.send.bind(null, 'bug'));
-            options.push({
-                text: '问题报错',
-                modal,
-                handler() {
-                    this.modal?.show();
-                },
-            });
-        }
-        if (params.featureModal !== false) {
-            const modal = new Modal(this.el, '意见反馈', '（必填）请输入您的建议/反馈');
-            typeof params.send === 'function' && modal.onenter(params.send.bind(null, 'feature'));
-            options.push({
-                text: '意见反馈',
-                modal,
-                handler() {
-                    this.modal?.show();
-                },
-            });
-        }
+        const options = params.option.reduce((list, item) => {
+            if (item.type === 'link') {
+                list.push({
+                    text: item.title,
+                    handler() {
+                        item.url && (window.location.href = item.url);
+                    },
+                });
+            }
+            else if (item.type === 'modal') {
+                const modalOpt: ModalOpt = {
+                    title: item.title,
+                    text: item.text,
+                };
+                if (item.img) {
+                    modalOpt.img = item.img === true ? {
+                        count: 4,
+                        itemSize: 2,
+                    } : item.img;
+                }
+                const modal = new Modal(this.el, modalOpt);
+                typeof params.send === 'function' && modal.onenter(params.send.bind(null, item.value || item.title));
+                list.push({
+                    text: item.title,
+                    modal,
+                    handler() {
+                        this.modal?.show();
+                    },
+                });
+            }
+            return list;
+        }, [] as Option[]);
         if (affix) {
             this.dropdown = new Dropdown(affix, options);
         }

@@ -1,6 +1,6 @@
 import Modal from './modal';
-import {template2dom, EventCleaner} from './utils';
-import styles from './assets/css/index.less';
+import {template2dom, EventCleaner} from './utils/utils';
+import styles from './assets/css/dropdown.less';
 
 export interface Option {
     text: string;
