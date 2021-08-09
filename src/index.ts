@@ -18,8 +18,8 @@ interface EntryOpt_Modal {
 }
 
 export interface Params {
-    defaultToast?: boolean;
     option: Array<EntryOpt_Link|EntryOpt_Modal>;
+    toast?(err: Error): false|string|void;
     send?(type: string, data: FormData): Promise<any>;
 }
 export class Feedback {
@@ -68,9 +68,14 @@ export class Feedback {
         if (affix) {
             this.dropdown = new Dropdown(affix, options);
         }
-        if (params.defaultToast !== false) {
-            this.dropdown?.onerror(e => {
-                const toast = template2dom(`<div class="${styles.error_toast} ${styles.hidden}">${e.message}</div>`);
+        this.dropdown?.onerror(e => {
+            const errMessage = params.toast?.(e) ?? e.message;
+            if (errMessage !== false) {
+                const toast = template2dom(`
+                    <div class="${styles.error_toast} ${styles.hidden}">
+                        ${String(errMessage)}
+                    </div>
+                `);
                 this.el.appendChild(toast);
                 window.requestAnimationFrame(() => {
                     toast.className = styles.error_toast;
@@ -78,13 +83,10 @@ export class Feedback {
                 setTimeout(() => {
                     this.el.removeChild(toast);
                 }, 2000);
-            });
-        }
+            }
+        });
         document.body.appendChild(this.el);
 
-    }
-    onerror(cb: (e: Error) => unknown) {
-        this.dropdown?.onerror(cb);
     }
     // 用于移除组件并清除后代绑定的事件
     unmount(): void {

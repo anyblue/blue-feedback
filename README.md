@@ -59,7 +59,6 @@ feedback.onerror((e) => {
 
 ### 实例方法
 + **unmount**：用于卸载插件
-+ **onerror**：监听插件内产生的异常，可用于对接自定义toast
 #### 自定义异常
 + **StateError**：上传图片解析失败
 + **SizeError**：单个图片大小超过上限

@@ -3,7 +3,6 @@ export declare class Feedback {
     constructor(params: Params)
     el: HTMLElement;
     unmounted(): void;
-    onerror(e: Error): void;
 }
 export type Data = Params;
 
