@@ -36,8 +36,8 @@ export default class ImagesUpload extends EventCleaner {
                 <input id="${this.id}" type="file" accept="image/*" style="display:none" multiple="multiple" />
                 <div class="${styles.placeholder}">
                     <label for="${this.id}"></label>
-                    <p class="${styles.title}">点击上面图标或拖入框内上传图片</p>
-                    <p class="${styles.description}">提示：1、单个图片大小≤${this.itemSize}M；2、图片个数≤${this.count}个</p>
+                    <p class="${styles.title}">点击上面图标上传图片或将图片拖入框内</p>
+                    <p class="${styles.description}">提示：1、单张图片大小≤${this.itemSize}M；2、图片数量≤${this.count}张</p>
                 </div>
             </div>
         `);
