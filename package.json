@@ -13,6 +13,7 @@
     "commitlint": "node scripts/verify-commit.js"
   },
   "files": [
+    "src",
     "dist",
     "example",
     "README.md",
