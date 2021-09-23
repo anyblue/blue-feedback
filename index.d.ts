@@ -1,8 +1,8 @@
-import type {Params} from './src/index'
+import type {Params} from './src/index';
 
 export declare class Feedback {
-    constructor(params: Params)
     el: HTMLElement;
+    constructor(params: Params)
     unmounted(): void;
 }
 

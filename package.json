@@ -1,9 +1,10 @@
 {
   "name": "blue-feedback",
-  "version": "0.4.5",
+  "version": "0.5.1",
   "description": "a light user feedback UI SDK",
-  "main": "./dist/main.min.js",
-  "module": "./dist/main.min.js",
+  "main": "./dist/main.umd.js",
+  "module": "./dist/main.umd.js",
+  "types": "index.d.ts",
   "scripts": {
     "dev": "webpack serve --progress --open --mode development",
     "build": "webpack --mode production",
@@ -11,11 +12,17 @@
     "release": "npm run build && node scripts/release.js",
     "commitlint": "node scripts/verify-commit.js"
   },
+  "files": [
+    "dist",
+    "example",
+    "README.md",
+    "index.d.ts"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/anyblue/blue-feedback.git"
   },
-  "author": "",
+  "author": "anyblue",
   "license": "ISC",
   "devDependencies": {
     "@babel/core": "^7.15.0",
@@ -48,6 +55,11 @@
     "webpack-cli": "^4.7.2",
     "webpack-dev-server": "^3.11.2"
   },
+  "keywords": [
+    "feedback",
+    "blue",
+    "component"
+  ],
   "bugs": {
     "url": "https://github.com/anyblue/blue-feedback/issues"
   },

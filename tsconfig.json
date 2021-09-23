@@ -28,9 +28,9 @@
     "include": [
       "src/**/*.ts",
       "src/**/*.d.ts",
-      "example/**/*.ts",
-      "shims.d.ts",
-    ],
+      "**/**/*.ts",
+      "**/**/*.d.ts"
+, "index.d.ts"    ],
     "exclude": [
         "node_modules"
     ]

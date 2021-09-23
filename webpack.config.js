@@ -33,7 +33,7 @@ module.exports = (env, argv) => {
         output: {
             clean: true,
             path: resolve('./dist'),
-            filename: '[name].min.js',
+            filename: '[name].umd.js',
             library: 'Feedback',
             libraryTarget: 'umd',
         },
