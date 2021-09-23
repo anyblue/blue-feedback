@@ -81,6 +81,7 @@ async function main() {
         type: 'confirm',
         name: 'yes',
         message: `Releasing ${tag}. Confirm?`,
+        initial: 'y',
     });
 
     if (!yes) {

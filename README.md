@@ -46,7 +46,7 @@ const feedback = new Feedback({
 ```
 
 
-## APIs
+## API
 ### 配置项
 
 | 名称            | 类型                                                         | 必选 | 说明                                                         |
