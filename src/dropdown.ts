@@ -15,42 +15,38 @@ export class Dropdown extends EventCleaner {
     constructor(wrap: HTMLElement, option: Option[]) {
         super();
         this.el = template2dom(`
-            <ul class="${`${styles.dropdown} ${styles.hidden}`}">
-            ${option.map((item, index) => `<li drop-index="${index}">${item.text}</li>`).join('')}
-            </ul>
+            <div class="${`${styles.dropdown_wrap} ${styles.hidden}`}">
+                <ul class="${styles.dropdown}">
+                ${option.map((item, index) => `<li drop-index="${index}">${item.text}</li>`).join('')}
+                </ul>
+            </div>
         `);
         this.option = option;
         this.addEventListener(this.el, 'click', event => {
             event.target as HTMLElement|null;
             const target = event.target as HTMLElement|null;
-            const index = Number(target?.getAttribute('drop-index'));
+            const index = parseInt(String(target?.getAttribute('drop-index')), 10);
             if (option[index]) {
                 option[index].handler();
                 this.hidden();
             }
         });
-        this.addEventListener(document.documentElement, 'click', event => {
-            const eventPath = event.composedPath();
-            if (eventPath.includes(this.el)) {
-                return;
-            }
-            if (!eventPath.includes(wrap) || this.actived) {
-                this.hidden();
-            }
-            else {
-                this.show();
-            }
+        this.addEventListener(wrap, 'mouseenter', () => {
+            this.show();
+        });
+        this.addEventListener(wrap, 'mouseleave', () => {
+            this.hidden();
         });
 
         wrap.appendChild(this.el);
     }
     hidden(): void {
         this.actived = false;
-        this.el.className = `${styles.dropdown} ${styles.hidden}`;
+        this.el.className = `${styles.dropdown_wrap} ${styles.hidden}`;
     }
     show(): void {
         this.actived = true;
-        this.el.className = `${styles.dropdown} ${styles.show}`;
+        this.el.className = `${styles.dropdown_wrap} ${styles.show}`;
     }
     unmounted(): void {
         this.clearEvent();
