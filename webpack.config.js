@@ -41,7 +41,14 @@ module.exports = (env, argv) => {
             rules: [
                 {
                     test: /\.ts$/i,
-                    use: ['babel-loader', 'ts-loader', 'eslint-loader'],
+                    use: [
+                        'babel-loader',
+                        {
+                            loader: 'ts-loader',
+                            options: {configFile: isDev ? 'tsconfig.json' : 'tsconfig.build.json'},
+                        },
+                        'eslint-loader',
+                    ],
                     exclude: /node_modules/,
                 },
                 {

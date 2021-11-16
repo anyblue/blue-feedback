@@ -9,9 +9,6 @@
 <img src="https://github.com/anyblue/blue-feedback/blob/main/example/preview.png" alt="预览" style="zoom:70%;" />
 
 
-## Feature
-+ typescript环境支持
-
 
 ## Install
 ```shell
