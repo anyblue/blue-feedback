@@ -1,3 +1,4 @@
+import 'core-js/modules/es.promise.all-settled';
 import styles from './assets/css/index.less';
 import toastStyles from './assets/css/errorToast.less';
 
