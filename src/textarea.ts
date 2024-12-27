@@ -6,6 +6,7 @@ import styles from './assets/css/textarea.less';
 export interface Params {
     placeholder?: string;
     maxLength?: number;
+    required?: boolean;
 }
 
 export default class Textarea extends EventCleaner {
