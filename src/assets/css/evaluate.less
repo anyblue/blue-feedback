@@ -1,0 +1,58 @@
+@import url('./config.less');
+
+.evaluate {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+
+    &_item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-size: @font-size-normal;
+        font-weight: 400;
+        color: @font-placeholder-color;
+        cursor: pointer;
+
+        div {
+            height: 30px;
+            width: 30px;
+            background-repeat: no-repeat;
+            background-size: 100% 100%;
+            margin-bottom: 16px;
+        }
+
+        .satisfied {
+            background-image: url('../images/satisfied.png');
+        }
+
+        .normal {
+            background-image: url('../images/normal.png');
+        }
+
+        .dissatisfied {
+            background-image: url('../images/dissatisfied.png');
+        }
+
+        &_active, &:hover {
+            color: @font-black-color;
+            font-weight: bolder;
+
+            .satisfied {
+                background-image: url('../images/satisfied_active.png');
+            }
+
+            .normal {
+                background-image: url('../images/normal_active.png');
+            }
+
+            .dissatisfied {
+                background-image: url('../images/dissatisfied_active.png');
+            }
+        }
+
+        & + .evaluate_item {
+            margin-left: 60px;
+        }
+    }
+}

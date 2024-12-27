@@ -15,6 +15,7 @@ interface EntryOpt_Modal {
     type: 'modal';
     title: string;
     value?: string;
+    evaluate?: Required<ModalOpt>['evaluate']|true;
     img?: Required<ModalOpt>['img']|true;
     text?: Required<ModalOpt>['text'];
 }
@@ -49,6 +50,11 @@ export class Feedback {
                     title: item.title,
                     text: item.text,
                 };
+                if (item.evaluate) {
+                    modalOpt.evaluate = item.evaluate === true ? {
+                        options: [],
+                    } : item.evaluate;
+                }
                 if (item.img) {
                     modalOpt.img = item.img === true ? {
                         count: 4,
@@ -86,7 +92,6 @@ export class Feedback {
             }
         });
         document.body.appendChild(this.el);
-
     }
     // 用于移除组件并清除后代绑定的事件
     unmount(): void {

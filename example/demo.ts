@@ -4,7 +4,7 @@ console.info(new Feedback({
     option: [
         {
             type: 'modal',
-            title: '问题报错',
+            title: '问题反馈',
             img: {
                 label: '问题图片',
                 count: 4,
@@ -18,16 +18,18 @@ console.info(new Feedback({
         },
         {
             type: 'modal',
-            title: '意见反馈',
+            title: '平台评价',
+            evaluate: true,
             img: {
-                label: '问题图片',
+                label: '评价图片',
                 count: 4,
                 itemSize: 2,
             },
             text: {
-                label: '问题描述',
+                label: '评价描述',
                 placeholder: '请输入您的建议/反馈',
                 maxLength: 2000,
+                required: true,
             },
         },
     ],

@@ -1,5 +1,6 @@
 import {template2dom, EventCleaner} from './utils/utils';
 import {ValidateError} from './utils/error';
+import Evaluate, {Params as EvaluateOpt} from './evaluate';
 import ImagesUpload, {Params as ImageOpt} from './imagesUpload';
 import Textarea, {Params as TextOpt} from './textarea';
 
@@ -12,6 +13,7 @@ interface Label {
 }
 export interface Params {
     title: string;
+    evaluate?: EvaluateOpt&Label;
     img?: ImageOpt&Label;
     text?: TextOpt&Label;
 }
@@ -28,8 +30,9 @@ const formRow = (el: HTMLElement, label: string, required?: boolean) => {
 
 export default class Modal extends EventCleaner {
     el: HTMLElement;
+    private readonly evaluate?: Evaluate;
     private readonly imagesUpload?: ImagesUpload;
-    private readonly textarea: Textarea;
+    private readonly textarea?: Textarea;
     private enterHandle?: EnterHandle;
     constructor(wrap: HTMLElement, params: Params) {
         super();
@@ -40,7 +43,7 @@ export default class Modal extends EventCleaner {
                         ${params.title}
                         <i class="${styles.close_btn}"></i>
                     </h3>
-                    <div class="${styles.modal_content}" ></div>
+                    <div class="${styles.modal_content}"></div>
                     <div class="${styles.modal_footer}">
                         <button
                             class="${`${styles.button} ${styles.enter}`}"
@@ -72,29 +75,34 @@ export default class Modal extends EventCleaner {
 
         const content = this.el.querySelector(`.${styles.modal_content}`);
 
-
         let filesError: Error[]|null = null;
         let textareaError: Error|null = null;
 
-        this.textarea = new Textarea(params.text);
         const checkError = () => {
             if (!enterBtn) {
                 return;
             }
-            if (textareaError || filesError?.length || !this.textarea.value.length) {
+            const evaluateError = this.evaluate && !this.evaluate?.value;
+            const imgError = this.imagesUpload && filesError?.length;
+            const textError = this.textarea
+            && (textareaError || params?.text?.required && !this.textarea.value.length);
+            if (evaluateError || textError || imgError) {
                 enterBtn.setAttribute('disabled', 'disabled');
             }
             else {
                 enterBtn.removeAttribute('disabled');
             }
         };
-        this.textarea.onchange((err, length) => {
-            textareaError = err;
-            if (!length && ![...this.el.classList].includes(styles.hidden)) {
-                textareaError = new ValidateError('文字描述必填');
-            }
-            checkError();
-        });
+
+        if (params.evaluate) {
+            this.evaluate = new Evaluate(params.evaluate);
+            content?.appendChild(
+                params.evaluate?.label
+                    ? formRow(this.evaluate.el, params.evaluate?.label ?? '满意度')
+                    : this.evaluate.el
+            );
+            this.evaluate?.onchange(checkError);
+        }
 
         if (params.img) {
             this.imagesUpload = new ImagesUpload(params.img);
@@ -104,15 +112,35 @@ export default class Modal extends EventCleaner {
                 checkError();
             });
         }
-        content?.appendChild(formRow(this.textarea.el, params.text?.label ?? '文字描述', true));
+
+        if (params.text) {
+            params.text.required = params.text?.required !== undefined ? params.text?.required : true;
+            this.textarea = new Textarea(params.text);
+            content?.appendChild(formRow(
+                this.textarea.el, params.text?.label ?? '文字描述',
+                params.text.required
+            ));
+            this.textarea.onchange((err, length) => {
+                textareaError = err;
+                if (!length && ![...this.el.classList].includes(styles.hidden)) {
+                    textareaError = new ValidateError('文字描述必填');
+                }
+                checkError();
+            });
+        }
         wrap.appendChild(this.el);
     }
     hidden(): void {
         document.body.style.overflow = '';
         document.body.style.position = '';
         this.el.className = `${styles.modal_wrap} ${styles.hidden}`;
+        if (this.evaluate) {
+            this.evaluate.value = '';
+        }
+        if (this.textarea) {
+            this.textarea.value = '';
+        }
         void this.imagesUpload?.setFiles([], false);
-        this.textarea.value = '';
     }
     show(): void {
         document.body.style.overflow = 'hidden';
@@ -120,8 +148,9 @@ export default class Modal extends EventCleaner {
         this.el.className = `${styles.modal_wrap} ${styles.show}`;
     }
     unmounted(): void {
+        this.evaluate?.unmounted();
         this.imagesUpload?.unmounted();
-        this.textarea.unmounted();
+        this.textarea?.unmounted();
         this.clearEvent();
     }
     onenter(cb: EnterHandle): void {
@@ -138,7 +167,8 @@ export default class Modal extends EventCleaner {
         }
         try {
             let formData = new window.FormData();
-            formData.append('adviceContent', this.textarea.value);
+            formData.append('adviceContent', this.textarea?.value ?? '');
+            formData.append('evaluateType', this.evaluate?.value ?? '');
             if (this.imagesUpload?.files.length) {
                 this.imagesUpload.files.forEach(item => {
                     formData.append('files', item.detail, item.detail.name);
@@ -147,7 +177,7 @@ export default class Modal extends EventCleaner {
             await this.enterHandle?.call(null, formData);
         }
         catch (e) {
-            this.emiterror(e);
+            this.emiterror(e as Error);
         }
         finally {
             if (enterBtn) {
