@@ -1,7 +1,14 @@
 import Feedback from 'src';
 
 console.info(new Feedback({
+    mode: 'expand',
+    wrapClassName: 'feedback-custom',
     option: [
+        {
+            type: 'link',
+            title: '跳转链接',
+            url: 'https://www.baidu.com',
+        },
         {
             type: 'modal',
             title: '问题反馈',
