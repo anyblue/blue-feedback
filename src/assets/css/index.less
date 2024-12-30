@@ -6,6 +6,20 @@ body {
 
 .affix_wrap {
     position: fixed;
+    font-weight: 500;
+    font-family: "PingFang SC", "Helvetica Neue", "Hiragino Sans GB", "Microsoft YaHei", Arial, SimSun, sans-serif;
+    font-size: @font-size-sub;
+    z-index: @z-index-middle;
+
+    &,
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+}
+
+.affix_dropdown {
     top: 70%;
     right: 0;
     width: 40px;
@@ -13,16 +27,7 @@ body {
     background: @const-theme-color;
     border-radius: 10px 0 0 10px;
     line-height: 16px;
-    font-weight: 500;
-    font-family: "PingFang SC", "Helvetica Neue", "Hiragino Sans GB", "Microsoft YaHei", Arial, SimSun, sans-serif;
-    font-size: @font-size-sub;
-    z-index: @z-index-middle;
-    &,
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
+
     .affix {
         color: @const-white-color;
         height: 100%;
@@ -34,6 +39,7 @@ body {
         white-space: wrap;
         padding: 10px;
         text-align: center;
+
         &::before {
             content: '';
             display: block;
@@ -42,5 +48,19 @@ body {
             background-image: url('../images/entry.svg');
             margin-bottom: 4px;
         }
+    }
+}
+
+.affix_expand {
+    top: 60%;
+    right: 10px;
+    background: @const-white-color;
+    box-shadow: 0 2px 8px 0 rgba(0, 0, 0, .15);
+    border-radius: 4px;
+
+    .affix {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
     }
 }

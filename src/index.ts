@@ -21,20 +21,29 @@ interface EntryOpt_Modal {
 }
 
 export interface Params {
+    mode?: 'dropdown'|'expand';
+    wrapClassName?: string;
     option: Array<EntryOpt_Link|EntryOpt_Modal>;
     toast?(err: Error): false|string|void;
     send?(type: string, data: FormData): Promise<any>;
 }
 export class Feedback {
-    el = template2dom(`
-        <div class="${styles.affix_wrap}">
-            <div class="${styles.affix}">
-                <span>咨询</span>
-            </div>
-        </div>
-    `);
+    el: HTMLElement;
+    mode: 'dropdown'|'expand';
     private readonly dropdown: Dropdown;
     constructor(params: Params) {
+        this.mode = params.mode ?? 'dropdown';
+        const affixWrapClass = [
+            styles.affix_wrap,
+            this.mode === 'dropdown' ? styles.affix_dropdown : styles.affix_expand,
+        ].join(' ');
+        this.el = template2dom(`
+            <div class="${affixWrapClass} ${params.wrapClassName ?? ''}">
+                <div class="${styles.affix}">
+                   ${this.mode === 'dropdown' ? '<span>咨询</span>' : ''}
+                </div>
+            </div>
+        `);
         const affix = this.el.querySelector(`.${styles.affix}`) as HTMLElement;
         const options = params.option.reduce((list, item) => {
             if (item.type === 'link') {
@@ -73,7 +82,10 @@ export class Feedback {
             }
             return list;
         }, [] as Option[]);
-        this.dropdown = new Dropdown(affix, options);
+        this.dropdown = new Dropdown(affix, {
+            mode: this.mode,
+            option: options,
+        });
         this.dropdown.onerror(e => {
             const errMessage = params.toast?.(e) ?? e.message;
             if (errMessage !== false) {

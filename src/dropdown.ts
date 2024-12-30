@@ -8,36 +8,47 @@ export interface Option {
     handler(): void;
 }
 
+export interface Params {
+    mode: 'dropdown'|'expand';
+    option: Option[];
+}
+
 export class Dropdown extends EventCleaner {
     el: HTMLElement;
-    actived = false;
+    mode: 'dropdown'|'expand';
     option: Option[];
-    constructor(wrap: HTMLElement, option: Option[]) {
+    actived = false;
+    constructor(wrap: HTMLElement, params: Params) {
         super();
+        this.mode = params.mode;
+        this.option = params.option;
+        const dropdownWrapClass = this.mode === 'dropdown'
+            ? `${styles.dropdown_wrap} ${styles.hidden}`
+            : styles.dropdown_expand;
         this.el = template2dom(`
-            <div class="${`${styles.dropdown_wrap} ${styles.hidden}`}">
+            <div class="${dropdownWrapClass}">
                 <ul class="${styles.dropdown}">
-                ${option.map((item, index) => `<li drop-index="${index}">${item.text}</li>`).join('')}
+                ${this.option.map((item, index) => `<li drop-index="${index}">${item.text}</li>`).join('')}
                 </ul>
             </div>
         `);
-        this.option = option;
         this.addEventListener(this.el, 'click', event => {
             event.target as HTMLElement|null;
             const target = event.target as HTMLElement|null;
             const index = parseInt(String(target?.getAttribute('drop-index')), 10);
-            if (option[index]) {
-                option[index].handler();
-                this.hidden();
+            if (this.option[index]) {
+                this.option[index].handler();
+                this.mode === 'dropdown' && this.hidden();
             }
         });
-        this.addEventListener(wrap, 'mouseenter', () => {
-            this.show();
-        });
-        this.addEventListener(wrap, 'mouseleave', () => {
-            this.hidden();
-        });
-
+        if (this.mode === 'dropdown') {
+            this.addEventListener(wrap, 'mouseenter', () => {
+                this.show();
+            });
+            this.addEventListener(wrap, 'mouseleave', () => {
+                this.hidden();
+            });
+        }
         wrap.appendChild(this.el);
     }
     hidden(): void {
