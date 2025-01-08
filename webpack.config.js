@@ -45,7 +45,10 @@ module.exports = (env, argv) => {
                         'babel-loader',
                         {
                             loader: 'ts-loader',
-                            options: {configFile: isDev ? 'tsconfig.json' : 'tsconfig.build.json'},
+                            options: {
+                                configFile: isDev ? 'tsconfig.json' : 'tsconfig.build.json',
+                                transpileOnly: true,
+                            },
                         },
                         'eslint-loader',
                     ],

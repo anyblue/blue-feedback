@@ -6,6 +6,8 @@ import Textarea, {Params as TextOpt} from './textarea';
 
 import styles from './assets/css/modal.less';
 
+const DEFAULT_ORDER = ['evaluate', 'img', 'text'];
+
 type EnterHandle = (data: FormData) => Promise<unknown>;
 
 interface Label {
@@ -16,6 +18,7 @@ export interface Params {
     evaluate?: EvaluateOpt&Label;
     img?: ImageOpt&Label;
     text?: TextOpt&Label;
+    order?: string[];
 }
 
 const formRow = (el: HTMLElement, label: string, required?: boolean) => {
@@ -30,12 +33,13 @@ const formRow = (el: HTMLElement, label: string, required?: boolean) => {
 
 export default class Modal extends EventCleaner {
     el: HTMLElement;
-    private readonly evaluate?: Evaluate;
-    private readonly imagesUpload?: ImagesUpload;
-    private readonly textarea?: Textarea;
+    private evaluate?: Evaluate;
+    private imagesUpload?: ImagesUpload;
+    private textarea?: Textarea;
     private enterHandle?: EnterHandle;
     constructor(wrap: HTMLElement, params: Params) {
         super();
+        params.order = params.order?.length ? params.order : DEFAULT_ORDER;
         this.el = template2dom(`
             <div class="${`${styles.modal_wrap} ${styles.hidden}`}">
                 <div class="${styles.modal}">
@@ -94,40 +98,43 @@ export default class Modal extends EventCleaner {
             }
         };
 
-        if (params.evaluate) {
-            this.evaluate = new Evaluate(params.evaluate);
-            content?.appendChild(
-                params.evaluate?.label
-                    ? formRow(this.evaluate.el, params.evaluate?.label ?? '满意度')
-                    : this.evaluate.el
-            );
-            this.evaluate?.onchange(checkError);
-        }
+        params.order.forEach(item => {
+            if (item === 'evaluate' && params.evaluate) {
+                this.evaluate = new Evaluate(params.evaluate);
+                content?.appendChild(
+                    params.evaluate?.label
+                        ? formRow(this.evaluate.el, params.evaluate?.label ?? '满意度')
+                        : this.evaluate.el
+                );
+                this.evaluate?.onchange(checkError);
+            }
 
-        if (params.img) {
-            this.imagesUpload = new ImagesUpload(params.img);
-            content?.appendChild(formRow(this.imagesUpload.el, params.img?.label ?? '上传图片'));
-            this.imagesUpload.onchange(err => {
-                filesError = err;
-                checkError();
-            });
-        }
+            if (item === 'img' && params.img) {
+                this.imagesUpload = new ImagesUpload(params.img);
+                content?.appendChild(formRow(this.imagesUpload.el, params.img?.label ?? '上传图片'));
+                this.imagesUpload.onchange(err => {
+                    filesError = err;
+                    checkError();
+                });
+            }
 
-        if (params.text) {
-            params.text.required = params.text?.required !== undefined ? params.text?.required : true;
-            this.textarea = new Textarea(params.text);
-            content?.appendChild(formRow(
-                this.textarea.el, params.text?.label ?? '文字描述',
-                params.text.required
-            ));
-            this.textarea.onchange((err, length) => {
-                textareaError = err;
-                if (!length && ![...this.el.classList].includes(styles.hidden)) {
-                    textareaError = new ValidateError('文字描述必填');
-                }
-                checkError();
-            });
-        }
+            if (item === 'text' && params.text) {
+                params.text.required = params.text?.required !== undefined ? params.text?.required : true;
+                this.textarea = new Textarea(params.text);
+                content?.appendChild(formRow(
+                    this.textarea.el, params.text?.label ?? '文字描述',
+                    params.text.required
+                ));
+                this.textarea.onchange((err, length) => {
+                    textareaError = err;
+                    if (params.text?.required && !length && ![...this.el.classList].includes(styles.hidden)) {
+                        textareaError = new ValidateError('文字描述必填');
+                    }
+                    checkError();
+                });
+            }
+        });
+
         wrap.appendChild(this.el);
     }
     hidden(): void {
@@ -168,7 +175,9 @@ export default class Modal extends EventCleaner {
         try {
             let formData = new window.FormData();
             formData.append('adviceContent', this.textarea?.value ?? '');
-            formData.append('evaluateType', this.evaluate?.value ?? '');
+            if (this.evaluate?.value) {
+                formData.append('evaluateType', this.evaluate.value);
+            }
             if (this.imagesUpload?.files.length) {
                 this.imagesUpload.files.forEach(item => {
                     formData.append('files', item.detail, item.detail.name);

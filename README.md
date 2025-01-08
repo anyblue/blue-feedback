@@ -21,6 +21,11 @@ npm install blue-feedback --save
 const feedback = new Feedback({
   option: [
     {
+      type: 'link',
+      title: '跳转链接',
+      url: 'https://www.baidu.com',
+    },
+    {
       type: 'modal',
       title: '问题报错',
       img: {
@@ -48,6 +53,8 @@ const feedback = new Feedback({
 
 | 名称            | 类型                                                         | 必选 | 说明                                                         |
 | --------------- | ------------------------------------------------------------ | ---- | ------------------------------------------------------------ |
+| ```mode``` | ```'dropdown'\|'expand'```                                                      | 否   | 默认为dropdown，用于切换入口样式                             |
+| ```wrapClassName``` | string                                               | 否   | 自定义外层容器样式                             |
 | ```helperUrl``` | string                                                       | 否   | 需要『智能客服』时，传入跳转 url                             |
 | ```toast```     | (e: Error) => string\|false\|void                            | 否   | 用于定制toast，返回```false```禁止默认toast；返回```void```使用默认toast行为；返回```string```修改toast信息 |
 | ```send```      | (*type*: 'bug'\|'feature', *data*: *FormData*): *Promise*<*any*> | 否   | 提交函数                                                     |
@@ -67,7 +74,9 @@ const feedback = new Feedback({
 + **url**：必填，页签跳转地址
 #### option.Modal[type="modal"]
 + **title**：必填，页签标题
-+ **value**：默认值同```title```，对应 send.args[0] 
++ **value**：默认值同```title```，对应 send.args[0]
++ **evaluate**：可选，评价满意度配置，为```true```时，应用默认值
+  + **options**：评价选项
 + **img**：可选，上传图片配置，为```true```时，应用默认值
   + **默认值**：{label: '上传图片', count: 4, itemSize: 2}
   + **label**：表单文案

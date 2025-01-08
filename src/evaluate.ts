@@ -57,7 +57,7 @@ export default class Evaluate extends EventCleaner {
             const evaluateElement = target?.getAttribute('data-evaluate-type') !== null
                 ? target : target?.parentElement;
             const value = evaluateElement?.getAttribute('data-evaluate-type') ?? '';
-            this.selectItem(value);
+            value && this.selectItem(value);
         });
     }
 

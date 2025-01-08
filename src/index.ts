@@ -18,6 +18,7 @@ interface EntryOpt_Modal {
     evaluate?: Required<ModalOpt>['evaluate']|true;
     img?: Required<ModalOpt>['img']|true;
     text?: Required<ModalOpt>['text'];
+    order?: string[];
 }
 
 export interface Params {
@@ -58,6 +59,7 @@ export class Feedback {
                 const modalOpt: ModalOpt = {
                     title: item.title,
                     text: item.text,
+                    order: item.order,
                 };
                 if (item.evaluate) {
                     modalOpt.evaluate = item.evaluate === true ? {
